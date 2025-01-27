@@ -1,0 +1,13 @@
+tools:
+  enable_sshd: true
+  enable_partitioning: true
+  enable_libvirt: true
+
+xen:
+  source: true # set to true to install Xen from source
+  version: "stable-4.19"
+
+sshd:
+  password:
+    vagrant: "azerty123"
+    root: "azerty123"

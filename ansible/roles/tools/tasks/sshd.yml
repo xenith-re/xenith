@@ -1,0 +1,27 @@
+---
+- name: Enable password authentification in SSH
+  ansible.builtin.lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: "^ChallengeResponseAuthentication"
+    line: "ChallengeResponseAuthentication yes"
+
+- name: Enable root login in SSH
+  ansible.builtin.lineinfile:
+    dest: /etc/ssh/sshd_config
+    regexp: "^PermitRootLogin"
+    line: "PermitRootLogin yes"
+
+- name: Restart SSH server
+  ansible.builtin.systemd:
+    name: sshd
+    state: restarted
+
+- name: Set password for vagrant account
+  ansible.builtin.user:
+    name: vagrant
+    password: "{{ sshd.password.vagrant }}"
+
+- name: Set password for root account
+  ansible.builtin.user:
+    name: root
+    password: "{{ sshd.password.root }}"

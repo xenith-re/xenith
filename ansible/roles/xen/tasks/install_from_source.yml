@@ -1,0 +1,93 @@
+---
+- name: Add APT source URIs
+  ansible.builtin.apt_repository:
+    repo: "deb-src http://httpredir.debian.org/debian bookworm main"
+    state: present
+    update_cache: true
+
+- name: Clone Xen source code
+  ansible.builtin.git:
+    repo: "git://xenbits.xen.org/xen.git"
+    dest: /home/vagrant/xen
+    version: "{{ xen.version }}"
+  become: false
+
+- name: Install Xen build dependencies with build-dep
+  ansible.builtin.apt:
+    name: xen
+    state: build-dep
+
+- name: Install Xen build dependencies
+  ansible.builtin.package:
+    name: "{{ item }}"
+  with_items:
+    - libnl-3-dev
+    - libnl-route-3-dev
+    - libsystemd-dev
+    - libsdl1.2-compat-dev
+    - flex
+    - bison
+    - texinfo
+    - ninja-build
+
+- name: Configure Xen
+  ansible.builtin.command: ./configure --prefix=/usr --libdir=/usr/lib64 --enable-systemd
+  args:
+    chdir: /home/vagrant/xen
+  become: false
+  register: configure_xen
+  changed_when: false
+  failed_when: configure_xen.rc != 0
+
+- name: Get number of processors
+  ansible.builtin.shell: "echo $(($(nproc)-1))"
+  register: nproc
+  changed_when: false
+  failed_when: nproc.rc != 0
+
+- name: Build Xen
+  ansible.builtin.command: make dist -j{{ nproc.stdout }}
+  args:
+    chdir: /home/vagrant/xen
+  become: false
+  register: build_xen
+  changed_when: false
+  failed_when: build_xen.rc != 0
+
+- name: Install Xen
+  ansible.builtin.command: make install -j{{ nproc.stdout }}
+  args:
+    chdir: /home/vagrant/xen
+  become: true
+  register: install_xen
+  changed_when: false
+  failed_when: install_xen.rc != 0
+
+- name: Rebuild dynamic linker cache
+  ansible.builtin.command: /sbin/ldconfig
+  register: ldconfig
+  changed_when: false
+  failed_when: ldconfig.rc != 0
+
+- name: Boot on Xen kernel by default
+  ansible.builtin.lineinfile:
+    path: /etc/default/grub.d/xen.cfg
+    line: 'GRUB_DEFAULT="Debian GNU/Linux, with Xen hypervisor"'
+    mode: "0640"
+    create: true
+
+- name: Update GRUB
+  ansible.builtin.command: update-grub
+  register: update_grub
+  changed_when: false
+  failed_when: update_grub.rc != 0
+
+- name: Enable Xen system services
+  ansible.builtin.service:
+    name: "{{ item }}"
+    enabled: true
+  with_items:
+    - xen-init-dom0.service
+    - xendomains.service
+    - xenconsoled.service
+    - xenstored.service

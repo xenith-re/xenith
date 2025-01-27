@@ -1,0 +1,11 @@
+- name: Install sshd
+  ansible.builtin.include_tasks: sshd.yml
+  when: tools.enable_sshd
+
+- name: Partition the disk
+  ansible.builtin.include_tasks: partition.yml
+  when: tools.enable_partitioning
+
+- name: Install libvirt
+  ansible.builtin.include_tasks: libvirt.yml
+  when: tools.enabled_libvirt

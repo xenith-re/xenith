@@ -1,0 +1,18 @@
+---
+- name: Check for virtualization extensions in cpuinfo
+  ansible.builtin.shell:
+      cmd: |
+        set -o pipefail
+        egrep '(vmx|svm)' /proc/cpuinfo
+      executable: /bin/bash
+  register: virtualization_extensions
+  changed_when: false
+  failed_when: virtualization_extensions.rc != 0
+
+- name: Install Xen from package
+  ansible.builtin.include_tasks: install_from_package.yml
+  when: not xen.source
+
+- name: Install Xen from source
+  ansible.builtin.include_tasks: install_from_source.yml
+  when: xen.source
