@@ -1,0 +1,8 @@
+# Vagrant
+.vagrant
+
+# Ansible
+.ansible
+
+# Code editor
+.vscode
