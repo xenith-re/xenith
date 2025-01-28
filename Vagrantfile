@@ -1,3 +1,7 @@
+# TODO:
+# - check PCI passthrough (https://vagrant-libvirt.github.io/vagrant-libvirt/configuration.html#pci-device-passthrough)
+# - edit host configuration (https://wiki.xenproject.org/wiki/Category:Host_Configuration)
+
 Vagrant.configure(2) do |config|
     config.vm.box = "debian/bookworm64"
     config.vm.define :xenith do |xenith|
@@ -11,11 +15,16 @@ Vagrant.configure(2) do |config|
     # Configure provider-specific settings
     config.vm.provider :libvirt do |libvirt|
         libvirt.driver = "kvm"
+        libvirt.kvm_hidden = true
         libvirt.nested = true
         libvirt.machine_virtual_size = 100
 
+        libvirt.storage :file, :size => '30G' # vdb
+        libvirt.storage :file, :size => '30G' # vdc
+
         # Configure CPU and memory
         libvirt.cpus = 8
+        # check https://libvirt.org/formatdomain.html#cpu-model-and-topology
         libvirt.cpu_mode = 'host-model'
         libvirt.cpu_fallback = 'forbid'
         libvirt.memory = 8192

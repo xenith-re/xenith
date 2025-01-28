@@ -8,4 +8,4 @@
 
 - name: Install libvirt
   ansible.builtin.include_tasks: libvirt.yml
-  when: tools.enabled_libvirt
+  when: tools.enable_libvirt
