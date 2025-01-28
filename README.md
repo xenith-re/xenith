@@ -32,6 +32,17 @@ To-do
 
 To-do
 
+You can view the full online documentation [here](https://standard3.github.io/xenith/) or build it locally using `mdbook`.
+
+```shell
+$ cargo install mdbook
+$ mdbook serve docs
+...
+2025-01-28 00:03:35 [INFO] (warp::server): listening on http://[::1]:3000
+```
+
+You can now view the built book by navigating to [http://localhost:3000](http://localhost:3000).
+
 ## 🔗 Credits
 
 To-do
