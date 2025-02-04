@@ -1,0 +1,16 @@
+[package]
+name = "xenith-redpill"
+description = "A rust *library* and binary for testing redpills (techniques to detect virtualized environments)."
+
+version = "0.1.0"
+edition = "2021"
+
+homepage = "<https://standard3.github.io/xenith/>"
+repository = "<https://github.com/standard3/xenith/>"
+
+keywords = ["virtualization", "detection"]
+license = "GPL-3.0"
+
+authors = ["abel <67806187+standard3@users.noreply.github.com>"]
+
+[dependencies]
