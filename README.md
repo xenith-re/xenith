@@ -46,3 +46,7 @@ You can now view the built book by navigating to [http://localhost:3000](http://
 ## 🔗 Credits
 
 To-do
+
+## 📜 License
+
+This project is licensed under the GPL-3.0 License - see the [LICENSE](LICENSE) file for details.
