@@ -14,3 +14,4 @@ license = "GPL-3.0"
 authors = ["abel <67806187+standard3@users.noreply.github.com>"]
 
 [dependencies]
+thiserror = "2.0.11"
