@@ -20,12 +20,14 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //!
 //! `xenith-redpill` is a collection of different techniques used to identify the presence of a generic hypervisor or **specifically Xen**.
 //!
-//! Inspired and based on the following projects :
+//! Inspired and based on the following resources.
 //! - [al-khaser](https://github.com/ayoubfaouzi/al-khaser)
 //! - [Hypervisor-Detection](https://github.com/void-stack/Hypervisor-Detection)
 //! - [VMDE](https://github.com/hfiref0x/VMDE)
 //! - [Pafish](https://github.com/a0rtega/pafish)
 //! - [VMAware](https://github.com/kernelwernel/VMAware)
+//!
+//! TODO: Add other resources that inspired this project.
 //!
 //! Those projects are great and I recommend you to check them out. This tool is just a collection of different techniques I found interesting and wanted to implement.
 //! Note that not every technique comes from those projects, some of them are from other sources that always will be mentioned in the code.
