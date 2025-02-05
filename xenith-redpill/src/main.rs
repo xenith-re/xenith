@@ -15,7 +15,17 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+use log::{info, LevelFilter};
+
+use xenith_redpill::detector::run_all_techniques;
 
 fn main() {
-    println!("Hello, world!");
+    const LOG_LEVEL: LevelFilter = LevelFilter::Debug;
+
+    let mut clog = colog::default_builder();
+    clog.filter(None, LOG_LEVEL);
+    clog.init();
+
+    info!("Running all detection techniques");
+    run_all_techniques();
 }
