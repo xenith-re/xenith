@@ -4,7 +4,7 @@
 <div align="left">
     <h1>Xenith</h1>
     <p>
-        Xenith is a lightweight Xen-based hypervisor designed for research and development in the realm of operating systems and virtualization. It provides advanced debugging capabilities, including low-level insights into guest systems and support for virtual machine introspection. Built with performance in mind, Xenith ensures minimal overhead for seamless execution of virtualized workloads. Its intuitive GUI simplifies management and monitoring, while a robust scripting API enables developers to automate tasks and extend functionality with ease.
+        Xenith is a lightweight Xen-based hypervisor designed for research and development in the realm of operating systems and virtualization. It provides a very stealth environment, advanced debugging capabilities, including low-level insights into guest systems and support for virtual machine introspection. Built with performance and stealth in mind, Xenith ensures minimal overhead for seamless execution of virtualized workloads. Its intuitive GUI simplifies management and monitoring, while a robust scripting API enables developers to automate tasks and extend functionality with ease.
     </p>
     <div align="center">
         <img src="https://img.shields.io/badge/Built%20with%20Rust-grey?style=for-the-badge&logo=rust&color=%23282828">
@@ -16,6 +16,7 @@
 
 With an intuitive graphical interface and robust scripting API, Xen ensures flexibility and efficiency for operating system and virtualization research. Its secure design, snapshot capabilities, and open-source nature make it an excellent choice for experimentation and innovation.
 
+- **Stealth**: Tested with our homemade cutting-edge anti-vm framework based on latest researches.
 - **Advanced Debugging Tools**: Comprehensive support for low-level debugging and iterative testing.
 - **Virtual Machine Introspection (VMI)**: Real-time insights into guest activity and resource usage.
 - **Graphical User Interface (GUI)**: Intuitive controls for managing virtual machines and configurations.
