@@ -1,5 +1,3 @@
-use std::fmt::Display;
-
 /*
 Xenith - Xen-based security hypervisor
 Copyright (C) 2025 Xenith contributors
@@ -17,18 +15,33 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+use std::error::Error;
+use std::sync::Mutex;
+
 use log::debug;
+use once_cell::sync::Lazy;
 use thiserror::Error;
 
-use crate::techniques::*;
+/// Singleton global technique registry, used to store all registered techniques
+static TECHNIQUE_REGISTRY: Lazy<Mutex<TechniqueRegistry>> =
+    Lazy::new(|| Mutex::new(TechniqueRegistry::new()));
 
+/// The result of a detection technique
 pub type TechniqueResult = Result<DetectionResult, TechniqueError>;
-pub type TechniqueFn = fn() -> TechniqueResult;
+
+/// Detection result
+///
+/// This enum represents the result of a detection technique. It can be either detected or not detected.
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
+pub enum DetectionResult {
+    Detected,
+    NotDetected,
+}
 
 /// Error type for techniques
 ///
 /// This error type is used to represent errors that can occur when running a technique.
-#[derive(Error, Debug)]
+#[derive(Error, Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
 pub enum TechniqueError {
     #[error("Technique failed")]
     Failed(),
@@ -39,166 +52,128 @@ pub enum TechniqueError {
 }
 
 /// A redpill technique
-///
-/// This struct represents a redpill technique that can be used to detect the presence of the Xen hypervisor.
-/// It contains a name, a description, and a function pointer to the technique implementation.
+/// This trait represents a redpill technique that can be used to detect the presence of the Xen hypervisor.
+/// It contains a name, a description, and an execute function.
 ///
 /// # Example
 ///
-/// ```
-/// use xenith_redpill::detector::{DetectionResult, Technique, TechniqueError};
-///
-/// fn technique_fn() -> Result<DetectionResult, TechniqueError> {
-///    // Technique implementation
-///    Ok(DetectionResult::Detected)
-/// }
-///
-/// let technique = Technique::new(
-///    String::from("technique_name"),
-///    String::from("Technique description"),
-///    technique_fn,
-/// );
-///
-/// let result = technique.run().unwrap();
-///
-/// let detected = match result {
-///   DetectionResult::Detected => true,
-///   DetectionResult::NotDetected => false,
-/// };
-/// ```
-#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct Technique {
-    name: String,
-    description: String,
-    fn_ptr: TechniqueFn,
+/// To-do
+pub trait Technique: Send + Sync {
+    fn name(&self) -> &'static str;
+    fn description(&self) -> &'static str;
+    fn execute(&self) -> TechniqueResult;
 }
 
-impl Technique {
-    /// Create a new technique
+/// A registry of techniques
+pub struct TechniqueRegistry {
+    techniques: Vec<Box<dyn Technique>>,
+}
+
+impl TechniqueRegistry {
+    /// Create a new technique registry
     ///
-    /// This function creates a new technique with the given name, description, and function pointer.
+    /// This function creates a new technique registry with an empty list of techniques.
+    pub fn new() -> Self {
+        let techniques = Vec::new();
+        TechniqueRegistry { techniques }
+    }
+
+    /// Register a technique with the registry
     ///
-    /// # Parameters
+    /// This function registers a new technique with the registry. If the technique is already registered, an error is returned.
     ///
-    /// - `name`: The name of the technique
-    /// - `description`: The description of the technique
-    /// - `fn_ptr`: The function pointer to the technique implementation
+    /// # Arguments
+    ///
+    /// * `technique` - The technique to register
     ///
     /// # Returns
     ///
-    /// A new technique
-    pub fn new(name: String, description: String, fn_ptr: TechniqueFn) -> Self {
-        Self {
-            name,
-            description,
-            fn_ptr,
-        }
-    }
-
-    /// Run the technique
-    ///
-    /// This function runs the technique and returns the result.
-    ///
-    /// # Returns
-    ///
-    /// The result of the technique
-    pub fn run(&self) -> TechniqueResult {
-        (self.fn_ptr)()
-    }
-
-    /// Get the name of the technique
-    pub fn name(&self) -> &String {
-        &self.name
-    }
-
-    /// Get the description of the technique
-    pub fn description(&self) -> &String {
-        &self.description
-    }
-
-    /// Get the function pointer of the technique
-    pub fn fn_ptr(&self) -> TechniqueFn {
-        self.fn_ptr
-    }
-}
-
-impl Display for Technique {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}: {}", self.name, self.description)
-    }
-}
-
-/// Detection result
-///
-/// This enum represents the result of a detection technique. It can be either detected or not detected.
-/// If detected, it contains the name and description of the used technique.
-pub enum DetectionResult {
-    Detected,
-    NotDetected,
-}
-
-/// Trait for techniques
-///
-/// This trait defines the interface for a list of techniques that can be used to detect the presence of the Xen hypervisor.
-pub trait TechniqueList {
-    /// Get a list of techniques
-    ///
-    /// This function returns a list of techniques that are implemented by the technique list.
-    ///
-    /// # Returns
-    ///
-    /// A list of techniques
-    fn get_techniques(&self) -> Vec<Technique>;
-
-    /// Run all techniques in the list
-    ///
-    /// This function runs all techniques in the list and returns true if any of them
-    /// return true. If none of the techniques return true, the function returns false.
+    /// A result indicating success or failure
     ///
     /// # Errors
     ///
-    /// This function returns an error if any of the techniques fail.
+    /// This function returns an error if the technique is already registered
+    pub fn register<T: Technique + 'static>(&mut self, technique: T) -> Result<(), Box<dyn Error>> {
+        if self.is_registered(&technique) {
+            return Err(Box::new(std::io::Error::new(
+                std::io::ErrorKind::AlreadyExists,
+                "Technique already registered",
+            )));
+        }
+
+        // Add the technique to the registry
+        debug!("Registering technique: {}", technique.name());
+        self.techniques.push(Box::new(technique));
+        Ok(())
+    }
+
+    /// Check if a technique is already registered
     ///
-    /// TODO:
-    /// - return a list of detected techniques
-    fn detect(&self) -> Vec<(Technique, TechniqueResult)> {
-        let techniques = self.get_techniques();
+    /// This function checks if a technique is already registered with the registry.
+    ///
+    /// # Arguments
+    ///
+    /// * `technique` - The technique to check
+    ///
+    /// # Returns
+    ///
+    /// A boolean indicating whether the technique is registered
+    ///
+    pub fn is_registered<T: Technique + 'static>(&self, technique: &T) -> bool {
+        self.techniques.iter().any(|t| t.name() == technique.name())
+    }
+
+    /// Get a list of all registered techniques
+    ///
+    /// This function returns a list of all registered techniques.
+    ///
+    /// # Returns
+    ///
+    /// A list of registered techniques
+    pub fn techniques(&self) -> &Vec<Box<dyn Technique>> {
+        &self.techniques
+    }
+
+    /// Run all techniques in the registry
+    ///
+    /// This function runs all techniques in the registry and returns a list of results.
+    ///
+    /// # Returns
+    ///
+    /// A list of tuples containing the technique and the result of the technique
+    pub fn run_all_techniques(&self) -> Vec<(&Box<dyn Technique>, TechniqueResult)> {
         let mut results = Vec::new();
-        for technique in techniques {
-            debug!("Running technique: {technique}");
-            let result = technique.run();
+        for technique in self.techniques.iter() {
+            debug!("Running technique: {}", technique.name());
+            let result = technique.execute();
             results.push((technique, result));
         }
         results
     }
 }
 
-/// Run all techniques to detect the presence of the Xen hypervisor
+/// Wrapper function to safely register a technique with the global registry
 ///
-/// This function runs all techniques to detect the presence of the Xen hypervisor
-/// by analyzing different detection aspects of the system like behavior, signatures, and time.
+/// # Arguments
+///
+/// * `technique` - The technique to register
 ///
 /// # Returns
 ///
-/// A list of detection results for each technique
-pub fn run_all_techniques() -> Vec<(Technique, TechniqueResult)> {
-    let techniques_list = vec![behavior::BehaviorTechniques];
-
-    let mut results = Vec::new();
-    for techniques in techniques_list {
-        results.extend(techniques.detect());
-    }
-    results
+/// A result indicating success or failure
+///
+/// # Errors
+///
+/// This function returns an error if the technique is already registered
+pub fn register_technique<T: Technique + 'static>(technique: T) -> Result<(), Box<dyn Error>> {
+    let mut registry = TECHNIQUE_REGISTRY.lock()?;
+    registry.register(technique)
 }
 
-/// Run all techniques in parallel to detect the presence of the Xen hypervisor
-///
-/// This function runs all techniques in parallel to detect the presence of the Xen hypervisor
-/// by analyzing different detection aspects of the system like behavior, signatures, and time.
-///
-/// # Returns
-///
-/// A list of detection results for each technique
-pub fn run_all_techniques_parallel() -> Vec<TechniqueResult> {
-    unimplemented!("Parallel detection is not implemented yet")
+/// Run all techniques in the global registry
+/// TODO: Return the list of results
+pub fn run_all_techniques() {
+    let registry = TECHNIQUE_REGISTRY.lock().unwrap();
+    registry.run_all_techniques();
+    ()
 }

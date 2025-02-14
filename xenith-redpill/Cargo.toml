@@ -5,15 +5,19 @@ description = "A rust *library* and binary for testing redpills (techniques to d
 version = "0.1.0"
 edition = "2021"
 
-homepage = "<https://standard3.github.io/xenith/>"
-repository = "<https://github.com/standard3/xenith/>"
+homepage = "<https://theo-abel.github.io/xenith/>"
+repository = "<https://github.com/theo-abel/xenith/>"
 
 keywords = ["virtualization", "detection"]
 license = "GPL-3.0"
 
-authors = ["abel <67806187+standard3@users.noreply.github.com>"]
+authors = ["abel <67806187+theo-abel@users.noreply.github.com>"]
 
 [dependencies]
+xenith-redpill-macros = { path = "xenith-redpill-macros" }
+
 colog = "1.3.0"
 log = "0.4.25"
 thiserror = "2.0.11"
+once_cell = "1.20.3"
+static_init = "1.0.3"
