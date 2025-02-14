@@ -36,5 +36,3 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 pub mod detector;
 pub mod techniques;
-
-pub use detector::run_all_techniques;
