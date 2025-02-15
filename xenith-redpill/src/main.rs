@@ -15,7 +15,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-use log::{info, LevelFilter};
+use log::{info, warn, LevelFilter};
 
 use xenith_redpill::prelude::*;
 
@@ -32,7 +32,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     for (name, result) in results {
         match result {
             Ok(DetectionResult::Detected) => {
-                info!(
+                warn!(
                     "⚠️ Technique {} detected the presence of the Xen hypervisor",
                     name
                 );
