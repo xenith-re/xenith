@@ -14,6 +14,7 @@ mathjax-support = true
 site-url = "/docs/"
 git-repository-url = "https://github.com/theo-abel/xenith/tree/main/docs"
 edit-url-template = "https://github.com/theo-abel/xenith/edit/main/docs/{path}"
+additional-js = ["mermaid.min.js", "mermaid-init.js"]
 
 [output.html.playground]
 editable = true
@@ -33,3 +34,8 @@ heading-split-level = 2
 
 [output.html.redirect]
 "/format/config.html" = "configuration/index.html"
+
+[preprocessor]
+
+[preprocessor.mermaid]
+command = "mdbook-mermaid"
