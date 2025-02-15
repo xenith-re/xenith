@@ -20,3 +20,35 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //!
 //! This module implements signature-based techniques to detect the presence of the Xen hypervisor
 //! by analyzing memory for known patterns or OS-specific structures.
+
+use log::error;
+use raw_cpuid::CpuId;
+use static_init::dynamic;
+
+use crate::{
+    detector::{register_technique, DetectionResult, Technique, TechniqueResult},
+    prelude::TechniqueError,
+};
+
+use xenith_redpill_macros::technique;
+
+#[technique(
+    name = "VMID",
+    description = "Check CPUID output of manufacturer ID for known VMs/hypervisors at leaf 0",
+    os = "all"
+)]
+fn vmid() -> TechniqueResult {
+    let vmid = "XenVMMXenVMM";
+
+    let cpuid = CpuId::new();
+
+    if let Some(vendor_id) = cpuid.get_vendor_info() {
+        if vendor_id.as_str() == vmid {
+            return Ok(DetectionResult::Detected);
+        }
+    } else {
+        return Err(TechniqueError::Failed());
+    };
+
+    Ok(DetectionResult::NotDetected)
+}
