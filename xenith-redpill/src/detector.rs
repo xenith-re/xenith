@@ -30,6 +30,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //! To-do
 
 use std::error::Error;
+use std::fmt::Debug;
 use std::sync::Mutex;
 
 use log::debug;
@@ -78,7 +79,17 @@ pub trait Technique: Send + Sync {
     fn execute(&self) -> TechniqueResult;
 }
 
+impl Debug for dyn Technique {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Technique")
+            .field("name", &self.name())
+            .field("description", &self.description())
+            .finish()
+    }
+}
+
 /// A registry of techniques
+#[derive(Debug, Default)]
 pub struct TechniqueRegistry {
     techniques: Vec<Box<dyn Technique>>,
 }
@@ -154,6 +165,7 @@ impl TechniqueRegistry {
     /// # Returns
     ///
     /// A list of tuples containing the technique and the result of the technique
+    #[allow(clippy::borrowed_box)] // would have to refactor the whole file to fix this
     pub fn run_all_techniques(&self) -> Vec<(&Box<dyn Technique>, TechniqueResult)> {
         let mut results = Vec::new();
         for technique in self.techniques.iter() {
