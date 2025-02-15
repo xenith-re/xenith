@@ -1,6 +1,2 @@
 # Don't need to reference the built site
 book
-
-# Mermaid-generated files
-mermaid-init.js
-mermaid.min.js
