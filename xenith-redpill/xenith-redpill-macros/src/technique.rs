@@ -84,8 +84,15 @@ pub fn technique_impl(args: TokenStream, input: TokenStream) -> TokenStream {
     };
 
     let expanded = quote! {
+        #[doc = concat!(
+            "# ", #technique_name, "\n\n",
+            "## Description\n\n",
+            #technique_description, "\n\n",
+            "## Operating system compatibility\n\n",
+            "This technique is compatible with the following operating systems: ", #technique_os, "\n"
+        )]
         #os_cfg
-        fn #function_name() -> TechniqueResult {
+        pub fn #function_name() -> TechniqueResult {
             #function_content
         }
 
