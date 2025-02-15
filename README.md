@@ -27,13 +27,11 @@ With an intuitive graphical interface and robust scripting API, Xen ensures flex
 
 ## 🧩 Usage
 
-To-do
+See the [introduction](https://theo-abel.github.io/xenith/index.html) guide for detailed instructions on building and running Xenith.
 
 ## 📚 Documentation
 
-To-do
-
-You can view the full online documentation [here](https://standard3.github.io/xenith/) or build it locally using `mdbook`.
+You can view the full online documentation [here](https://theo-abel.github.io/xenith/) or build it locally using `mdbook`.
 
 ```shell
 $ cargo install mdbook
@@ -46,7 +44,7 @@ You can now view the built book by navigating to [http://localhost:3000](http://
 
 ## 🔗 Credits
 
-To-do
+See documentation [credits](https://theo-abel.github.io/xenith/credits.html).
 
 ## 📜 License
 
