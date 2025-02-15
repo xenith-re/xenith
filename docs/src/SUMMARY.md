@@ -31,3 +31,4 @@
 
 [FAQ](faq.md)
 [Contributors](contributors.md)
+[Credits](credits.md)
