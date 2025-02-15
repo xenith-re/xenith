@@ -20,3 +20,20 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //!
 //! This module implements behavior-based techniques to identify the presence of the Xen hypervisor
 //! by analyzing system responses to specific instructions and interactions.
+
+use log::error;
+use static_init::dynamic;
+
+use crate::detector::{register_technique, DetectionResult, Technique, TechniqueResult};
+
+use xenith_redpill_macros::technique;
+
+#[technique(
+    name = "CPUID check",
+    description = "Detects the presence of the Xen hypervisor by analyzing the CPUID instruction",
+    os = "all"
+)]
+fn cpuid() -> TechniqueResult {
+    println!("Running cpuid technique");
+    Ok(DetectionResult::NotDetected)
+}
