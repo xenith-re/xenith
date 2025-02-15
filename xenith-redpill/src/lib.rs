@@ -18,7 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 //! # xenith-redpill
 //!
-//! `xenith-redpill` is a collection of different techniques used to identify the presence of a generic hypervisor or **specifically Xen**.
+//! `xenith-redpill` is a collection of different techniques used to identify the presence of a generic hypervisor or **specifically Xen** on x86-64 machines.
 //!
 //! Inspired and based on the following resources.
 //! - [al-khaser](https://github.com/ayoubfaouzi/al-khaser)
