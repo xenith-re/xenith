@@ -34,7 +34,7 @@ See the [introduction](https://theo-abel.github.io/xenith/index.html) guide for 
 You can view the full online documentation [here](https://theo-abel.github.io/xenith/) or build it locally using `mdbook`.
 
 ```shell
-$ cargo install mdbook
+$ cargo install mdbook mdbook-mermaid
 $ mdbook serve docs
 ...
 2025-01-28 00:03:35 [INFO] (warp::server): listening on http://[::1]:3000
