@@ -112,3 +112,23 @@ fn hypervisor_brand() -> TechniqueResult {
     // If the hypervisor brand is not available, it is likely that the CPU is not running in a VM
     Ok(DetectionResult::NotDetected)
 }
+
+#[technique(
+    name = "Hardware threads count",
+    description = "Check if there are 2 or less threads, which is a common pattern in VMs with default settings.
+    Nowadays, physical CPUs should have at least 4 threads for modern ones.",
+    os = "all"
+)]
+fn hardware_threads_count() -> TechniqueResult {
+    // We don't use CPUID here because it's not reliable for this purpose as Intel CPUs reserve this attribute.
+    // See : https://docs.rs/raw-cpuid/latest/raw_cpuid/struct.CpuId.html#method.get_processor_topology_info
+    // Also, `num_cpus` looks at other sources to get the number of cores, including Linux cgroups for example.
+
+    let cpu_cores = num_cpus::get();
+
+    if cpu_cores <= 2 {
+        return Ok(DetectionResult::Detected);
+    }
+
+    Ok(DetectionResult::NotDetected)
+}
