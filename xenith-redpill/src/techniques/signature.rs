@@ -52,3 +52,24 @@ fn vmid() -> TechniqueResult {
 
     Ok(DetectionResult::NotDetected)
 }
+
+#[technique(
+    name = "CPU Brand",
+    description = "Check if CPU brand model contains any VM-specific string snippets",
+    os = "all"
+)]
+fn cpu_brand() -> TechniqueResult {
+    let vm_brand = "xen";
+
+    let cpuid = CpuId::new();
+
+    if let Some(brand) = cpuid.get_processor_brand_string() {
+        if brand.as_str().to_lowercase().contains(vm_brand) {
+            return Ok(DetectionResult::Detected);
+        }
+    } else {
+        return Err(TechniqueError::Failed());
+    }
+
+    Ok(DetectionResult::NotDetected)
+}
