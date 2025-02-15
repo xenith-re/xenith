@@ -14,7 +14,8 @@ mathjax-support = true
 site-url = "/docs/"
 git-repository-url = "https://github.com/theo-abel/xenith/tree/main/docs"
 edit-url-template = "https://github.com/theo-abel/xenith/edit/main/docs/{path}"
-additional-js = ["mermaid.min.js", "mermaid-init.js"]
+additional-js = ["js/mermaid.min.js", "js/mermaid-init.js"]
+additional-css = ["css/mdbook-admonish.css"]
 
 [output.html.playground]
 editable = true
@@ -39,3 +40,11 @@ heading-split-level = 2
 
 [preprocessor.mermaid]
 command = "mdbook-mermaid"
+
+[preprocessor.admonish]
+command = "mdbook-admonish"
+assets_version = "3.0.2"    # do not edit: managed by `mdbook-admonish install`
+after = ["links"]
+
+[preprocessor.admonish.renderer.test]
+render_mode = "strip"

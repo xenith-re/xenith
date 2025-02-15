@@ -30,7 +30,7 @@ jobs:
         run: |
           curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf -y | sh
           rustup update
-          cargo install mdbook mdbook-mermaid
+          cargo install mdbook mdbook-mermaid mdbook-admonish
 
       - name: Setup Pages
         id: pages
