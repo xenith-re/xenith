@@ -17,5 +17,6 @@ authors = ["abel <67806187+theo-abel@users.noreply.github.com>"]
 proc-macro = true
 
 [dependencies]
+darling = "0.20.10"
 quote = "1.0.38"
 syn = { version = "2.0.98", features = ["full"] }
