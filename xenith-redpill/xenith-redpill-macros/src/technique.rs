@@ -1,3 +1,4 @@
+use convert_case::{Case, Casing};
 use darling::ast::NestedMeta;
 use darling::{Error, FromMeta};
 use proc_macro::TokenStream;
@@ -64,10 +65,11 @@ pub fn technique_impl(args: TokenStream, input: TokenStream) -> TokenStream {
     let technique_description = &args.description;
     let technique_os = &args.os;
 
+    let function_name_as_camel_case = function_name.to_string().to_case(Case::Camel);
     let struct_name = syn::Ident::new(
         &format!(
             "{}Technique",
-            uppercase_first_letter(function_name.to_string())
+            uppercase_first_letter(function_name_as_camel_case)
         ),
         function_name.span(),
     );
