@@ -1,6 +1,6 @@
 # Introduction
 
-to-do
+This part of documentation is to be written.
 
 ## Contributing
 
@@ -9,4 +9,4 @@ If you'd like to contribute to fix bugs and add feature, please read the [CONTRI
 
 ## License
 
-The Xenith source and documentation are released under the TO-DO.
+The Xenith source and documentation are released under the [GPL-3.0 license](https://www.gnu.org/licenses/gpl-3.0.en.html).
