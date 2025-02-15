@@ -35,4 +35,5 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //! This is a continuous work in progress crate and I will keep adding new techniques as I discover them.
 
 pub mod detector;
+pub mod prelude;
 pub mod techniques;
