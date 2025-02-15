@@ -27,7 +27,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //! - [Pafish](https://github.com/a0rtega/pafish)
 //! - [VMAware](https://github.com/kernelwernel/VMAware)
 //!
-//! TODO: Add other resources that inspired this project.
+//! Also based on multiple research papers and articles found on the Github repository [awesome-anti-virtualization](https://github.com/theo-abel/awesome-anti-virtualization).
 //!
 //! Those projects are great and I recommend you to check them out. This tool is just a collection of different techniques I found interesting and wanted to implement.
 //! Note that not every technique comes from those projects, some of them are from other sources that always will be mentioned in the code.
