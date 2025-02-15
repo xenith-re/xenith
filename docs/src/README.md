@@ -16,6 +16,10 @@ You may now wonder, what makes Xenith special and useful ?
 
 If you want to learn more about Xenith, check the [documentation organization](documentation.md) and start exploring the project.
 
+## Community
+
+Xenith wish to be a community-driven project. We welcome contributions from everyone, whether you're a developer, researcher, or enthusiast. Join our [Discord server](https://discord.gg/ABBtPA8exa) to share your ideas, ask questions, and collaborate with others.
+
 ## Contributing
 
 Xenith is free and open source. You can find the source code on GitHub and issues and feature requests can be posted on the [GitHub issue tracker](https://github.com/theo-abel/xenith/issues).
