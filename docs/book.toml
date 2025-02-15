@@ -12,8 +12,8 @@ edition = "2021"
 [output.html]
 mathjax-support = true
 site-url = "/docs/"
-git-repository-url = "https://github.com/standard3/xenith/tree/main/docs"
-edit-url-template = "https://github.com/standard3/xenith/edit/main/docs/{path}"
+git-repository-url = "https://github.com/theo-abel/xenith/tree/main/docs"
+edit-url-template = "https://github.com/theo-abel/xenith/edit/main/docs/{path}"
 
 [output.html.playground]
 editable = true
