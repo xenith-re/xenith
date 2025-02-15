@@ -73,3 +73,22 @@ fn cpu_brand() -> TechniqueResult {
 
     Ok(DetectionResult::NotDetected)
 }
+
+#[technique(
+    name = "Hypervisor Feature Bit",
+    description = "Check if hypervisor feature bit in CPUID eax bit 31 is enabled (always false for physical CPUs)",
+    os = "all"
+)]
+fn hypervisor_feature_bit() -> TechniqueResult {
+    let cpuid = CpuId::new();
+
+    if let Some(features) = cpuid.get_feature_info() {
+        if features.has_hypervisor() {
+            return Ok(DetectionResult::Detected);
+        }
+    } else {
+        return Err(TechniqueError::Failed());
+    }
+
+    Ok(DetectionResult::NotDetected)
+}
