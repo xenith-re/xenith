@@ -1,4 +1,4 @@
-# Setup development environment
+# Getting Started
 
 install ansible
 install vagrant

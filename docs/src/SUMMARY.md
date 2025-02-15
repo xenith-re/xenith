@@ -2,20 +2,32 @@
 
 [Introduction](README.md)
 
-## Developer Guide
+# Development
 
-- [Setup development environment](guide/development.md)
+- [Getting Started](development/getting-started.md)
+- [Testing](development/testing.md)
+- [Contributing](development/contributing.md)
+- [Releasing](development/releasing.md)
 
-## User Guide
+# Explanations
 
-- [Installation](guide/installation.md)
-- [Usage](guide/usage.md)
+- [Overview](explanations/overview.md)
+- [Architecture](explanations/architecture.md)
+- [Features](explanations/features.md)
 
-## Reference Guide
+# Tutorials
 
-This part of documention is to be done.
+- [Getting Started](tutorials/getting-started.md)
+- [Scripting](tutorials/scripting.md)
+- [Using GUI](tutorials/using-gui.md)
 
------------
+# Reference
 
-[Decisions](misc/decisions.md)
-[Contributors](misc/contributors.md)
+- [Redpill](reference/redpill.md)
+- [Project crates](reference/crates/README.md)
+  - [xenith-redpill](reference/crates/xenith-redpill.md)
+
+---
+
+[FAQ](faq.md)
+[Contributors](contributors.md)

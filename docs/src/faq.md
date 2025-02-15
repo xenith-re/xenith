@@ -1,4 +1,4 @@
-# Decisions
+# FAQ
 
 This document is a collection of decisions made during the development of Xenith and the reasoning behind them.
 
