@@ -15,6 +15,20 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
+
+//! Detector module
+//!
+//! This module provides the core functionality for detecting the presence of the Xen hypervisor.
+//!
+//! A singleton global technique registry (see [`TECHNIQUE_REGISTRY`]) is used to store all registered techniques. Techniques are
+//! represented by the [`Technique`] trait, which contains a name, a description, and an execute function.
+//!
+//! The [`TechniqueRegistry`] struct is used to store a list of techniques and provides functions to register and run techniques.
+//!
+//! # Example
+//!
+//! To-do
+
 use std::error::Error;
 use std::sync::Mutex;
 
@@ -118,7 +132,6 @@ impl TechniqueRegistry {
     /// # Returns
     ///
     /// A boolean indicating whether the technique is registered
-    ///
     pub fn is_registered<T: Technique + 'static>(&self, technique: &T) -> bool {
         self.techniques.iter().any(|t| t.name() == technique.name())
     }
@@ -171,9 +184,22 @@ pub fn register_technique<T: Technique + 'static>(technique: T) -> Result<(), Bo
 }
 
 /// Run all techniques in the global registry
-/// TODO: Return the list of results
-pub fn run_all_techniques() {
-    let registry = TECHNIQUE_REGISTRY.lock().unwrap();
-    registry.run_all_techniques();
-    ()
+///
+/// This function runs all techniques in the global registry and returns a list of results.
+///
+/// # Returns
+///
+/// A list of tuples containing the name of the technique and the result of the technique
+///
+/// # Errors
+///
+/// This function returns an error if the global registry is locked
+pub fn run_all_techniques() -> Result<Vec<(String, TechniqueResult)>, Box<dyn Error>> {
+    let registry = TECHNIQUE_REGISTRY.lock()?;
+    let results = registry
+        .run_all_techniques()
+        .into_iter()
+        .map(|(technique, result)| (technique.name().to_string(), result))
+        .collect();
+    Ok(results)
 }

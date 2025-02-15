@@ -17,9 +17,9 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 use log::{info, LevelFilter};
 
-use xenith_redpill::detector::run_all_techniques;
+use xenith_redpill::prelude::*;
 
-fn main() {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     const LOG_LEVEL: LevelFilter = LevelFilter::Debug;
 
     let mut clog = colog::default_builder();
@@ -27,5 +27,27 @@ fn main() {
     clog.init();
 
     info!("Running all detection techniques");
-    run_all_techniques();
+    let results = run_all_techniques()?;
+
+    for (name, result) in results {
+        match result {
+            Ok(DetectionResult::Detected) => {
+                info!(
+                    "⚠️ Technique {} detected the presence of the Xen hypervisor",
+                    name
+                );
+            }
+            Ok(DetectionResult::NotDetected) => {
+                info!(
+                    "✅ Technique {} did not detect the presence of the Xen hypervisor",
+                    name
+                );
+            }
+            Err(e) => {
+                info!("❌ Technique {} failed with error: {:?}", name, e);
+            }
+        }
+    }
+
+    Ok(())
 }
