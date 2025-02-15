@@ -1,5 +1,5 @@
 <p>
-    <img src="assets/xenith-banner-rounded.png" alt="Xenith banner" width="100%">
+    <img src="docs/src/assets/xenith-banner-rounded.png" alt="Xenith banner" width="100%">
 </p>
 <div align="left">
     <h1>Xenith</h1>
