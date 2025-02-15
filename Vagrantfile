@@ -35,8 +35,9 @@ Vagrant.configure(2) do |config|
         libvirt.nested = true
         libvirt.machine_virtual_size = 100
 
-        libvirt.storage :file, :size => '30G' # vdb
-        libvirt.storage :file, :size => '30G' # vdc
+        # Configure storage
+        libvirt.storage :file, :size => '30G' # vdb, dom0 storage
+        libvirt.storage :file, :size => '30G' # vdc, domU storage
 
         # Configure CPU and memory
         libvirt.cpus = 8
@@ -55,6 +56,9 @@ Vagrant.configure(2) do |config|
     ANSIBLE_COMPATIBILITY_MODE = "2.0"
     ANSIBLE_VERBOSITY = "" # can be up to "-vvv" for more verbosity
 
+    # Pre-reboot
+    # - Install Xen
+    # - Install common packages
     config.vm.provision "ansible" do |ansible|
         ansible.compatibility_mode = ANSIBLE_COMPATIBILITY_MODE
         ansible.verbose = ANSIBLE_VERBOSITY
@@ -63,6 +67,9 @@ Vagrant.configure(2) do |config|
 
     config.vm.provision :reload
 
+    # Post-reboot
+    # - Install and configure SSH daemon
+    # - Disk partitioning
     config.vm.provision "ansible" do |ansible|
         ansible.compatibility_mode = ANSIBLE_COMPATIBILITY_MODE
         ansible.verbose = ANSIBLE_VERBOSITY
