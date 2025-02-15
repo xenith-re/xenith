@@ -22,7 +22,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //! by analyzing memory for known patterns or OS-specific structures.
 
 use log::error;
-use raw_cpuid::CpuId;
+use raw_cpuid::{CpuId, Hypervisor};
 use static_init::dynamic;
 
 use crate::{
@@ -90,5 +90,25 @@ fn hypervisor_feature_bit() -> TechniqueResult {
         return Err(TechniqueError::Failed());
     }
 
+    Ok(DetectionResult::NotDetected)
+}
+
+#[technique(
+    name = "Hypervisor Brand",
+    description = "Check for hypervisor brand string length (would be around 2 characters in a host machine)",
+    os = "all"
+)]
+fn hypervisor_brand() -> TechniqueResult {
+    let cpuid = CpuId::new();
+
+    if let Some(hypervisor_info) = cpuid.get_hypervisor_info() {
+        return match hypervisor_info.identify() {
+            Hypervisor::Xen => Ok(DetectionResult::Detected),
+            Hypervisor::Unknown(_, _, _) => Ok(DetectionResult::Detected),
+            _ => unreachable!("An hypervisor brand was detected, but it was not Xen"),
+        };
+    };
+
+    // If the hypervisor brand is not available, it is likely that the CPU is not running in a VM
     Ok(DetectionResult::NotDetected)
 }
