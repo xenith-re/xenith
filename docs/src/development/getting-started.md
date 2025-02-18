@@ -168,7 +168,7 @@ We use Ansible to provision the virtual machines that we use for development. Yo
 **Arch Linux**
 
 ```shell
-sudo pacman -S ansible
+sudo pacman -S ansible python-passlib
 ```
 
 **Ubuntu**
@@ -186,3 +186,7 @@ You can do this by running the following command:
 ```shell
 ansible-galaxy collection install ansible.posix
 ```
+
+## Using Vagrant
+
+To-do
