@@ -215,3 +215,63 @@ pub fn run_all_techniques() -> Result<Vec<(String, TechniqueResult)>, Box<dyn Er
         .collect();
     Ok(results)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[derive(Clone, Copy)]
+    struct TestTechnique;
+
+    impl Technique for TestTechnique {
+        fn name(&self) -> &'static str {
+            "TestTechnique"
+        }
+
+        fn description(&self) -> &'static str {
+            "Test technique"
+        }
+
+        fn execute(&self) -> TechniqueResult {
+            Ok(DetectionResult::Detected)
+        }
+    }
+
+    #[test]
+    fn test_technique_registry() {
+        let mut registry = TechniqueRegistry::new();
+        let technique = TestTechnique;
+
+        assert!(matches!(registry.register(technique), Ok(())));
+
+        assert_eq!(registry.is_registered(&technique), true);
+        assert_eq!(registry.techniques().len(), 1);
+        assert_eq!(registry.techniques()[0].name(), "TestTechnique");
+        assert_eq!(registry.techniques()[0].description(), "Test technique");
+    }
+
+    #[test]
+    fn test_register_technique() {
+        let mut technique_registry = TechniqueRegistry::new();
+        let technique = TestTechnique;
+
+        assert!(matches!(technique_registry.register(technique), Ok(())));
+        assert!(matches!(
+            technique_registry.register(technique),
+            Err(e) if e.to_string() == "Technique already registered"
+        ));
+    }
+
+    #[test]
+    fn test_run_all_techniques() {
+        let mut technique_registry = TechniqueRegistry::new();
+        let technique = TestTechnique;
+
+        assert!(matches!(technique_registry.register(technique), Ok(())));
+
+        let results = technique_registry.run_all_techniques();
+        assert_eq!(results.len(), 1);
+        assert_eq!(results[0].0.name(), "TestTechnique");
+        assert_eq!(results[0].1, Ok(DetectionResult::Detected));
+    }
+}
