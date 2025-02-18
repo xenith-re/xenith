@@ -16,3 +16,12 @@
     - build-essential
     - python3
     - python3-dev
+
+- name: Create xenith user
+  ansible.builtin.user:
+    name: xenith
+    shell: /bin/bash
+    groups: sudo
+    append: true
+    create_home: true
+    password: "{{ 'xenith' | password_hash('sha512') }}"
