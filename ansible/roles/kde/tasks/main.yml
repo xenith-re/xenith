@@ -1,0 +1,9 @@
+---
+- name: Install KDE Desktop Environment
+  ansible.builtin.package:
+    name: "{{ item }}"
+  with_items:
+    - kde-plasma-desktop
+    - sddm
+    - kde-config-sddm
+    - sddm-theme-debian-breeze
