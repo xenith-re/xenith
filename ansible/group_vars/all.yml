@@ -1,7 +1,7 @@
 tools:
   enable_sshd: true
   enable_partitioning: true
-  enable_libvirt: true
+  enable_libvirt: false
 
 xen:
   source: true # set to true to install Xen from source
