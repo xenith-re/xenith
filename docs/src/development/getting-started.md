@@ -37,7 +37,7 @@ sudo pacman -S qemu-desktop
 **Ubuntu**
 
 ```shell
-sudo apt install qemu qemu-kvm bridge-utils
+sudo apt install qemu qemu-kvm bridge-utils -y
 ```
 
 ### libvirt
@@ -57,7 +57,7 @@ sudo pacman -S libvirt
 **Ubuntu**
 
 ```shell
-sudo apt install libvirt-daemon-system
+sudo apt install libvirt-daemon-system -y
 ```
 
 The easiest way to ensure your user has access to libvirt daemon is to add member to `libvirt` user group. Members of the libvirt group have passwordless access to the RW daemon socket by default. You can do that by running the following commands:
@@ -80,6 +80,26 @@ If you don't want to start the `libvirtd` service after each reboot, you can ena
 sudo systemctl start libvirtd
 ```
 ~~~
+
+### virt-viewer
+
+```admonish summary
+Virt-viewer is a lightweight UI interface for interacting with the graphical display of virtualized guest OS. It is a minimalistic interface that allows you to interact with the guest OS without the need for a full-blown desktop environment.
+```
+
+You can install `virt-viewer` on your system using the following commands:
+
+**Arch Linux**
+
+```shell
+sudo pacman -S virt-viewer
+```
+
+**Ubuntu**
+
+```shell
+sudo apt install virt-viewer -y
+```
 
 ### Vagrant
 
@@ -110,7 +130,7 @@ echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://
 
 # Once the repo is added, proceed to install vagrant
 sudo apt update
-sudo apt install vagrant
+sudo apt install vagrant -y
 ```
 
 #### vagrant-libvirt plugin
@@ -137,7 +157,7 @@ This manipulation can be done in your shell configuration file (e.g. `~/.bashrc`
 Make sure you have the necessary dependencies installed:
 
 ```shell
-sudo apt install ebtables libguestfs-tools ruby-fog-libvirt
+sudo apt install ebtables libguestfs-tools ruby-fog-libvirt -y
 ```
 
 Then install the plugin:
@@ -189,4 +209,28 @@ ansible-galaxy collection install ansible.posix
 
 ## Using Vagrant
 
-To-do
+Now that you have all the necessary tools installed, you can clone the Xenith repository and setup the development environment quickly using Vagrant.
+
+```shell
+vagrant up
+```
+
+This command will start the virtual machine and provision it using Ansible. Once the process is complete, you can :
+
+1. SSH into the dom0virtual machine using the following command:
+
+```shell
+vagrant ssh
+```
+
+2. Access the graphical display of the dom0 virtual machine using our custom Vagrant command:
+
+```shell
+vagrant virt-viewer --dom0
+```
+
+3. Access the graphical display of the dom0 virtual machine directly with `virt-viewer`:
+
+```shell
+virt-manager --connect qemu:///system --show-domain-console xenith_xenith
+```
