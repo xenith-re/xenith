@@ -244,7 +244,7 @@ mod tests {
 
         assert!(matches!(registry.register(technique), Ok(())));
 
-        assert_eq!(registry.is_registered(&technique), true);
+        assert!(registry.is_registered(&technique));
         assert_eq!(registry.techniques().len(), 1);
         assert_eq!(registry.techniques()[0].name(), "TestTechnique");
         assert_eq!(registry.techniques()[0].description(), "Test technique");
