@@ -22,7 +22,7 @@ Vagrant.configure(2) do |config|
     config.vm.box = "debian/bookworm64"
     config.vm.define :xenith do |xenith|
         xenith.vm.hostname = "xenith"
-        xenith.vm.network :private_network, :ip => "192.168.124.10"
+        xenith.vm.network :private_network, :ip => "192.168.126.10"
     end
 
     # Disable synced folder
@@ -49,7 +49,11 @@ Vagrant.configure(2) do |config|
         # Configure network
         libvirt.nic_model_type = "virtio"
         libvirt.management_network_name = 'xenith-network'
-        libvirt.management_network_address = '192.168.124.0/24'
+        libvirt.management_network_address = '192.168.126.0/24'
+
+        # Configure graphics
+        libvirt.video_type = "qxl"
+        libvirt.graphics_type = "vnc"
     end
 
     # Provisioning
