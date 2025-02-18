@@ -40,7 +40,7 @@
   failed_when: configure_xen.rc != 0
 
 - name: Get number of processors
-  ansible.builtin.shell: "echo $(($(nproc)-1))"
+  ansible.builtin.shell: "echo $(($(nproc)-2))" # -2 to leave some CPU for the host
   register: nproc
   changed_when: false
   failed_when: nproc.rc != 0
