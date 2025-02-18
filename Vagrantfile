@@ -14,10 +14,6 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-# TODO:
-# - check PCI passthrough (https://vagrant-libvirt.github.io/vagrant-libvirt/configuration.html#pci-device-passthrough)
-# - edit host configuration (https://wiki.xenproject.org/wiki/Category:Host_Configuration)
-
 Vagrant.configure(2) do |config|
     config.vm.box = "debian/bookworm64"
     config.vm.define :xenith do |xenith|
