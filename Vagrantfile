@@ -21,10 +21,7 @@ Vagrant.configure(2) do |config|
         xenith.vm.network :private_network, :ip => "192.168.126.10"
     end
 
-    # Disable synced folder
-    config.vm.synced_folder ".", "/vagrant", disabled: true
-
-    # Configure provider-specific settings
+    # Configure libvirt settings
     config.vm.provider :libvirt do |libvirt|
         libvirt.driver = "kvm"
         libvirt.kvm_hidden = true
@@ -50,7 +47,12 @@ Vagrant.configure(2) do |config|
         # Configure graphics
         libvirt.video_type = "qxl"
         libvirt.graphics_type = "vnc"
+
+        libvirt.memorybacking :access, :mode => "shared"
     end
+
+    # Synced folders
+    config.vm.synced_folder "./", "/vagrant", type: "virtiofs"
 
     # Provisioning
     ANSIBLE_COMPATIBILITY_MODE = "2.0"
