@@ -1,0 +1,14 @@
+[package]
+name = "xenith-vmi"
+description = "Library for interacting with Xen domU through Virtual Machine Introspection (VMI)."
+
+version = "0.1.0"
+edition = "2021"
+
+homepage = "<https://theo-abel.github.io/xenith/>"
+repository = "<https://github.com/theo-abel/xenith/>"
+
+keywords = ["virtualization", "detection"]
+license = "GPL-3.0"
+
+authors = ["abel <67806187+theo-abel@users.noreply.github.com>"]
