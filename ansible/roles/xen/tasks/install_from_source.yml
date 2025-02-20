@@ -5,13 +5,6 @@
     state: present
     update_cache: true
 
-- name: Clone Xen source code
-  ansible.builtin.git:
-    repo: "git://xenbits.xen.org/xen.git"
-    dest: /home/vagrant/xen
-    version: "{{ xen.version }}"
-  become: false
-
 - name: Install Xen build dependencies with build-dep
   ansible.builtin.apt:
     name: xen
@@ -33,7 +26,7 @@
 - name: Configure Xen
   ansible.builtin.command: ./configure --prefix=/usr --libdir=/usr/lib64 --enable-systemd
   args:
-    chdir: /home/vagrant/xen
+    chdir: "{{ xen.source_path }}"
   become: false
   register: configure_xen
   changed_when: false
@@ -48,7 +41,7 @@
 - name: Build Xen
   ansible.builtin.command: make dist -j{{ nproc.stdout }}
   args:
-    chdir: /home/vagrant/xen
+    chdir: "{{ xen.source_path }}"
   become: false
   register: build_xen
   changed_when: false
@@ -57,7 +50,7 @@
 - name: Install Xen
   ansible.builtin.command: make install -j{{ nproc.stdout }}
   args:
-    chdir: /home/vagrant/xen
+    chdir: "{{ xen.source_path }}"
   become: true
   register: install_xen
   changed_when: false

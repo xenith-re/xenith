@@ -3,9 +3,11 @@ tools:
   enable_partitioning: true
   enable_libvirt: false
 
+shared_folder: "/vagrant"
+
 xen:
   source: true # set to true to install Xen from source
-  version: "stable-4.19"
+  source_path: "{{ shared_folder }}/xen"
 
 sshd:
   password:

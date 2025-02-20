@@ -1,6 +1,6 @@
 [package]
 name = "xenith-redpill"
-description = "A rust *library* and binary for testing redpills (techniques to detect virtualized environments)."
+description = "Library and (small) CLI for testing redpills (techniques to detect virtualized environments)."
 
 version = "0.1.0"
 edition = "2021"
