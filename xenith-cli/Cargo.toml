@@ -8,7 +8,19 @@ edition = "2021"
 homepage = "<https://theo-abel.github.io/xenith/>"
 repository = "<https://github.com/theo-abel/xenith/>"
 
-keywords = ["virtualization", "detection"]
+keywords = ["virtualization", "xenith", "xen", "cli", "tool"]
 license = "GPL-3.0"
 
 authors = ["abel <67806187+theo-abel@users.noreply.github.com>"]
+
+[[bin]]
+name = "xenith"
+path = "src/main.rs"
+
+[dependencies]
+anstyle = "1.0.10"
+clap = { version = "4.5.30", features = ["derive"] }
+clap-verbosity-flag = "3.0.2"
+colog = "1.3.0"
+log = "0.4.25"
+termcolor = "1.4.1"
