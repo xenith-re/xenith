@@ -12,3 +12,6 @@ keywords = ["virtualization", "detection"]
 license = "GPL-3.0"
 
 authors = ["abel <67806187+theo-abel@users.noreply.github.com>"]
+
+[dependencies]
+mac_address = "1.1.8"
