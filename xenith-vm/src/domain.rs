@@ -25,6 +25,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //! This crate does not need to be a second `xl` tool, but it should provide a simple
 //! and easy-to-use interface for managing domains on Xenith.
 
+use crate::error::CpuidError;
+
 use std::{fmt::Display, path::PathBuf};
 
 use mac_address::MacAddress;
@@ -464,6 +466,142 @@ impl Display for EmulatedDiskControllerType {
     }
 }
 
+/// Represents the access mode to the alternate-p2m capability
+#[derive(Debug, Clone, Default, Eq, PartialEq, Ord, PartialOrd, Hash)]
+pub enum Alternate2pmMode {
+    /// Altp2m is disabled for the domain
+    #[default]
+    Disabled,
+    /// The mixed mode allows access to the altp2m interface for both in-guest and
+    /// external tools as well.
+    Mixed,
+    /// Enables access to the alternate-p2m capability by external privileged tools.
+    External,
+    /// Enables limited access to the alternate-p2m capability, ie. giving the guest
+    /// access only to enable/disable the VMFUNC and #VE features.
+    Limited,
+}
+
+impl Display for Alternate2pmMode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Alternate2pmMode::Disabled => write!(f, "disabled"),
+            Alternate2pmMode::Mixed => write!(f, "mixed"),
+            Alternate2pmMode::External => write!(f, "external"),
+            Alternate2pmMode::Limited => write!(f, "limited"),
+        }
+    }
+}
+
+/// Represents the notation for a CPUID feature bit
+#[derive(Debug, Clone, Default, Eq, PartialEq, Ord, PartialOrd, Hash)]
+pub enum CpuidFeatureBit {
+    /// Force the corresponding bit to 1
+    Force1,
+    /// Force the corresponding bit to 0
+    Force0,
+    /// Get a safe value (pass through and mask with the default policy)
+    SafeValue,
+    /// pass through the host bit value (at boot only - value preserved on
+    /// migrate)
+    #[default]
+    Passthrough,
+}
+
+impl Display for CpuidFeatureBit {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            CpuidFeatureBit::Force1 => write!(f, "1"),
+            CpuidFeatureBit::Force0 => write!(f, "0"),
+            CpuidFeatureBit::SafeValue => write!(f, "x"),
+            CpuidFeatureBit::Passthrough => write!(f, "k"),
+        }
+    }
+}
+
+/// The CPUID configuration for a domain
+///
+/// This employs the xend format, which consists of an array of one or more strings of the form
+/// "leaf:reg=bitstring,...".
+///
+/// List of keys taking a character can be found in the public header file:
+/// `xen/include/public/arch-x86/cpufeatureset.h`
+///
+/// This does not implement every possible key, only the most useful ones for
+/// Xenith, mainly for evading VM detection.
+#[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
+pub struct Cpuid {
+    /// The CPUID feature bit for the hypervisor
+    hypervisor: CpuidFeatureBit,
+    /// The vendor info is a 12-byte (96 bit) long string, which is used to
+    /// identify the vendor of the CPU. This is used by some software to
+    /// determine the CPU vendor, and can be used to detect if the CPU is
+    /// running in a virtual machine.
+    vendor: [u8; 12],
+    /// Processor Brand String is a 48-byte (384 bit) long string, which is
+    /// used to identify the brand of the CPU. This is used by some software
+    /// to determine the CPU brand, and can be used to detect if the CPU is
+    /// running in a virtual machine.
+    ///
+    /// See https://en.wikipedia.org/wiki/CPUID#EAX=8000'0002h,8000'0003h,8000'0004h:_Processor_Brand_String
+    processor_brand_string: [u8; 48],
+    /// The hypervisor brand is a 12-byte (96 bit) long string, which is used
+    /// to identify the brand of the hypervisor. This is used by some software
+    /// to determine the hypervisor brand, and can be used to detect if the CPU
+    /// is running in a virtual machine.
+    ///
+    /// See https://en.wikipedia.org/wiki/CPUID#EAX=4000'0000h-4FFFF'FFFh:_Reserved_for_Hypervisors
+    hypervisor_brand: [u8; 12],
+}
+
+impl Default for Cpuid {
+    fn default() -> Self {
+        Self {
+            hypervisor: CpuidFeatureBit::default(),
+            vendor: [0; 12],
+            processor_brand_string: [0; 48],
+            hypervisor_brand: [0; 12],
+        }
+    }
+}
+
+impl Cpuid {
+    /// Create a new *hidden* CPUID configuration with host values.
+    ///
+    /// This is used to hide the fact that the CPU is running in a virtual machine.
+    /// It sets the hypervisor feature bit to 0, and sets the vendor, processor brand string,
+    /// and hypervisor brand to the host values.
+    pub fn new_hidden() -> Result<Self, CpuidError> {
+        let host_cpuid = raw_cpuid::CpuId::new();
+
+        let vendor_info = host_cpuid.get_vendor_info().ok_or(CpuidError::VendorInfo)?;
+        let vendor = vendor_info
+            .as_str()
+            .as_bytes()
+            .try_into()
+            .map_err(|e| CpuidError::ConversionError(format!("Vendor info: {e}")))?;
+
+        let processor_brand_string = host_cpuid
+            .get_processor_brand_string()
+            .ok_or(CpuidError::ProcessorBrandString)?;
+        let processor_brand = processor_brand_string
+            .as_str()
+            .as_bytes()
+            .try_into()
+            .map_err(|e| CpuidError::ConversionError(format!("Processor brand string: {e}")))?;
+
+        // Because there is no hypervisor 😉
+        let hypervisor_brand = [0u8; 12];
+
+        Ok(Self {
+            hypervisor: CpuidFeatureBit::Force0,
+            vendor: vendor,
+            processor_brand_string: processor_brand,
+            hypervisor_brand,
+        })
+    }
+}
+
 /// Represents a Xen domain configuration
 /// This is not a complete list of all the configuration options available for a Xen domain,
 /// as Xenith does not need to expose all the options to the user. It only exposes the most
@@ -504,8 +642,23 @@ pub struct Domain {
     boot_device: Vec<BootDevice>,
     /// Specifies the type of emulated disk controller to use.
     emulated_disk_controller: EmulatedDiskControllerType,
-
-
-    // Todo: continue line 1460 from man xl.cfg
-    alternate_2pm:
+    /// Alternative p2m (altp2m) allows external monitoring of guest memory
+    /// by maintaining multiple physical to machine (p2m) memory mappings.
+    /// Specifies the access mode to the alternate-p2m capability.
+    /// Alternative p2m allows a guest to manage multiple physical to machine (p2m) guest
+    /// physical "memory views" (as opposed to a single p2m). You may want this option if
+    /// you want to access-control/isolate access to specific guest physical memory pages
+    /// accessed by the guest, e.g. for domain memory introspection or for
+    /// isolation/access-control of memory between components within a single guest domain.
+    /// This option is disabled by default.
+    alternate_2pm: Alternate2pmMode,
+    /// Enable or disables guest access to hardware virtualisation features, e.g. it
+    /// allows a guest Operating System to also function as a hypervisor. You may want
+    /// this option if you want to run another hypervisor (including another copy of Xen)
+    /// within a Xen guest or to support a guest Operating System which uses hardware
+    /// virtualisation extensions (e.g. Windows XP compatibility mode on more modern
+    /// Windows OS).
+    nested_hvm: bool,
+    /// Configure the value returned when a guest executes the CPUID instruction.
+    cpuid: Cpuid,
 }

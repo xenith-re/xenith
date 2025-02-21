@@ -15,3 +15,5 @@ authors = ["abel <67806187+theo-abel@users.noreply.github.com>"]
 
 [dependencies]
 mac_address = "1.1.8"
+raw-cpuid = "11.4.0"
+thiserror = "2.0.11"
