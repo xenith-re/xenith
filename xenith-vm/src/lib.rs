@@ -48,3 +48,15 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 pub mod actions;
 pub mod domain;
 pub mod error;
+
+/// Allows for the generation of the xl domain configuration
+pub trait XlConfiguration {
+    /// Generate the xl configuration string for the domain
+    ///
+    /// # Returns
+    ///
+    /// A string containing the xl configuration for the domain
+    fn xl_config(&self) -> String {
+        unimplemented!()
+    }
+}
