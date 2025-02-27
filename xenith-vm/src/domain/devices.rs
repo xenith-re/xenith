@@ -21,6 +21,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 use std::fmt::Display;
 use std::path::PathBuf;
 
+use crate::XlConfiguration;
+
 /// List of supported disk formats
 #[derive(Debug, Clone, Default, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub enum DiskFormat {
@@ -116,6 +118,24 @@ impl Display for Disk {
     }
 }
 
+/// Represents a list of disk devices attached to a virtual machine
+/// The disk devices can be used for storing the operating system, data, or other files.
+#[derive(Debug, Clone, Default, Eq, PartialEq, Ord, PartialOrd, Hash)]
+pub struct DiskDevices(Vec<Disk>);
+
+impl XlConfiguration for DiskDevices {
+    // disk=[ "DISK_SPEC_STRING", "DISK_SPEC_STRING", ...]
+    fn xl_config(&self) -> String {
+        let mut disks = String::new();
+        for disk in &self.0 {
+            disks.push_str(&format!("\"{}\", ", disk));
+        }
+        disks.pop();
+        disks.pop();
+        format!("disk=[ {} ]", disks)
+    }
+}
+
 /// Represents the boot device for the virtual machine
 ///
 /// The boot device is used to specify the device from which the virtual machine should boot.
@@ -134,6 +154,21 @@ impl Display for BootDevice {
             BootDevice::CdRom => write!(f, "d"),
             BootDevice::Network => write!(f, "n"),
         }
+    }
+}
+
+/// Represents the list of boot devices for the virtual machine
+#[derive(Debug, Clone, Default, Eq, PartialEq, Ord, PartialOrd, Hash)]
+pub struct BootDevices(Vec<BootDevice>);
+
+impl XlConfiguration for BootDevices {
+    // boot="BOOT_DEVICE_STRING"
+    fn xl_config(&self) -> String {
+        let mut boot_devices = String::new();
+        for boot_device in &self.0 {
+            boot_devices.push_str(&format!("{}", boot_device));
+        }
+        format!("boot=\"{}\"", boot_devices)
     }
 }
 
@@ -157,5 +192,99 @@ impl Display for EmulatedDiskControllerType {
             EmulatedDiskControllerType::Ide => write!(f, "ide"),
             EmulatedDiskControllerType::Ahci => write!(f, "ahci"),
         }
+    }
+}
+
+impl XlConfiguration for EmulatedDiskControllerType {
+    // hdtype="DISK_CONTROLLER_TYPE"
+    fn xl_config(&self) -> String {
+        format!("hdtype=\"{}\"", self)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_disk_format_display() {
+        assert_eq!(format!("{}", DiskFormat::Raw), "raw");
+        assert_eq!(format!("{}", DiskFormat::Qcow), "qcow");
+        assert_eq!(format!("{}", DiskFormat::Qcow2), "qcow2");
+        assert_eq!(format!("{}", DiskFormat::Vhd), "vhd");
+        assert_eq!(format!("{}", DiskFormat::Qed), "qed");
+    }
+
+    #[test]
+    fn test_disk_access_display() {
+        assert_eq!(format!("{}", DiskAccess::ReadOnly), "ro");
+        assert_eq!(format!("{}", DiskAccess::ReadWrite), "rw");
+    }
+
+    #[test]
+    fn test_disk_display() {
+        let disk = Disk {
+            target: PathBuf::from("/dev/sda"),
+            size: 1024,
+            format: DiskFormat::Qcow2,
+            access: DiskAccess::ReadWrite,
+            virtual_device: "xvda".to_string(),
+        };
+        assert_eq!(
+            format!("{}", disk),
+            "format=qcow2, vdev=xvda, access=rw, target=/dev/sda"
+        );
+    }
+
+    #[test]
+    fn test_disk_devices_xl_config() {
+        let disk1 = Disk {
+            target: PathBuf::from("/dev/sda"),
+            size: 1024,
+            format: DiskFormat::Qcow2,
+            access: DiskAccess::ReadWrite,
+            virtual_device: "xvda".to_string(),
+        };
+        let disk2 = Disk {
+            target: PathBuf::from("/dev/sdb"),
+            size: 2048,
+            format: DiskFormat::Raw,
+            access: DiskAccess::ReadOnly,
+            virtual_device: "xvdb".to_string(),
+        };
+        let disk_devices = DiskDevices(vec![disk1, disk2]);
+        assert_eq!(
+            disk_devices.xl_config(),
+            "disk=[ \"format=qcow2, vdev=xvda, access=rw, target=/dev/sda\", \"format=raw, vdev=xvdb, access=ro, target=/dev/sdb\" ]"
+        );
+    }
+
+    #[test]
+    fn test_boot_device_display() {
+        assert_eq!(format!("{}", BootDevice::HardDisk), "c");
+        assert_eq!(format!("{}", BootDevice::CdRom), "d");
+        assert_eq!(format!("{}", BootDevice::Network), "n");
+    }
+
+    #[test]
+    fn test_boot_devices_xl_config() {
+        let boot_devices = BootDevices(vec![
+            BootDevice::HardDisk,
+            BootDevice::CdRom,
+            BootDevice::Network,
+        ]);
+        assert_eq!(boot_devices.xl_config(), "boot=\"cdn\"");
+    }
+
+    #[test]
+    fn test_emulated_disk_controller_type_display() {
+        assert_eq!(format!("{}", EmulatedDiskControllerType::Ide), "ide");
+        assert_eq!(format!("{}", EmulatedDiskControllerType::Ahci), "ahci");
+    }
+
+    #[test]
+    fn test_emulated_disk_controller_type_xl_config() {
+        let disk_controller = EmulatedDiskControllerType::Ahci;
+        assert_eq!(disk_controller.xl_config(), "hdtype=\"ahci\"");
     }
 }

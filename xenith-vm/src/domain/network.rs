@@ -22,6 +22,8 @@ use std::fmt::Display;
 
 use mac_address::MacAddress;
 
+use crate::XlConfiguration;
+
 /// Represents the type of network interface attached to a virtual machine
 #[derive(Debug, Clone, Default, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub enum NetworkInterfaceType {
@@ -140,5 +142,103 @@ impl Default for NetworkInterface {
             r#type: NetworkInterfaceType::default(),
             model: Some(NetworkInterfaceModel::Rtl8139),
         }
+    }
+}
+
+impl Display for NetworkInterface {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
+            "mac={}, bridge={}, gateway={}, type={}, model={}",
+            self.mac,
+            self.bridge,
+            self.gateway_device,
+            self.r#type,
+            self.model.as_ref().unwrap()
+        )
+    }
+}
+
+/// Represents a list of network interfaces attached to a domain.
+#[derive(Debug, Clone, Default, Eq, PartialEq, Ord, PartialOrd, Hash)]
+pub struct NetworkInterfaces(Vec<NetworkInterface>);
+
+impl XlConfiguration for NetworkInterfaces {
+    // vif=[ "NET_SPEC_STRING", "NET_SPEC_STRING", ...]
+    // where each vifspec is in this form: [<key>=<value>|<flag>,]
+    fn xl_config(&self) -> String {
+        let mut vifs = String::new();
+        for vif in &self.0 {
+            vifs.push_str(&format!("\"{}\", ", vif));
+        }
+        vifs.pop();
+        vifs.pop();
+        format!("disk=[ {} ]", vifs)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use std::str::FromStr;
+
+    use super::*;
+
+    #[test]
+    fn test_network_interface_type_display() {
+        assert_eq!(NetworkInterfaceType::IoEmu.to_string(), "ioemu");
+        assert_eq!(NetworkInterfaceType::Vif.to_string(), "vif");
+    }
+
+    #[test]
+    fn test_network_interface_model_display() {
+        assert_eq!(NetworkInterfaceModel::Rtl8139.to_string(), "rtl8139");
+        assert_eq!(NetworkInterfaceModel::E1000.to_string(), "e1000");
+        assert_eq!(
+            NetworkInterfaceModel::AnySupported("model".to_string()).to_string(),
+            "model"
+        );
+    }
+
+    #[test]
+    fn test_network_interface_display() {
+        let network_interface = NetworkInterface {
+            name: "vif0.0".to_string(),
+            mac: MacAddress::from_str("00:16:3e:00:00:00").unwrap(),
+            bridge: "xenbr0".to_string(),
+            gateway_device: "eth0".to_string(),
+            r#type: NetworkInterfaceType::IoEmu,
+            model: Some(NetworkInterfaceModel::Rtl8139),
+        };
+        assert_eq!(
+            network_interface.to_string(),
+            "mac=00:16:3E:00:00:00, bridge=xenbr0, gateway=eth0, type=ioemu, model=rtl8139"
+        );
+    }
+
+    #[test]
+    fn test_network_interfaces_xl_config() {
+        let network_interfaces = NetworkInterfaces(vec![
+            NetworkInterface {
+                name: "vif0.0".to_string(),
+                mac: MacAddress::from_str("00:16:3e:00:00:00").unwrap(),
+                bridge: "xenbr0".to_string(),
+                gateway_device: "eth0".to_string(),
+                r#type: NetworkInterfaceType::IoEmu,
+                model: Some(NetworkInterfaceModel::Rtl8139),
+            },
+            NetworkInterface {
+                name: "vif0.1".to_string(),
+                mac: MacAddress::from_str("00:16:3e:00:00:01").unwrap(),
+                bridge: "xenbr0".to_string(),
+                gateway_device: "eth0".to_string(),
+                r#type: NetworkInterfaceType::IoEmu,
+                model: Some(NetworkInterfaceModel::Rtl8139),
+            },
+        ]);
+
+        assert_eq!(
+            network_interfaces.xl_config(),
+            "disk=[ \"mac=00:16:3E:00:00:00, bridge=xenbr0, gateway=eth0, type=ioemu, model=rtl8139\", \"mac=00:16:3E:00:00:01, bridge=xenbr0, gateway=eth0, type=ioemu, model=rtl8139\" ]"
+        );
     }
 }

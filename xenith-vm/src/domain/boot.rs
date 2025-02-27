@@ -18,6 +18,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 //! Boot configuration structures and options for a domain.
 
+use crate::XlConfiguration;
+
 use std::fmt::Display;
 use std::path::PathBuf;
 
@@ -56,7 +58,44 @@ impl Display for Firmware {
             Firmware::Seabios => write!(f, "seabios"),
             Firmware::Rombios => write!(f, "rombios"),
             Firmware::Ovmf => write!(f, "ovmf"),
-            Firmware::Path(path) => write!(f, "path={}", path.display()),
+            Firmware::Path(path) => write!(f, "{}", path.display()),
         }
+    }
+}
+
+impl XlConfiguration for Firmware {
+    fn xl_config(&self) -> String {
+        format!("firmware={}", self)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_firmware_display() {
+        assert_eq!(Firmware::Bios.to_string(), "bios");
+        assert_eq!(Firmware::Uefi.to_string(), "uefi");
+        assert_eq!(Firmware::Seabios.to_string(), "seabios");
+        assert_eq!(Firmware::Rombios.to_string(), "rombios");
+        assert_eq!(Firmware::Ovmf.to_string(), "ovmf");
+        assert_eq!(
+            Firmware::Path(PathBuf::from("/path/to/file")).to_string(),
+            "/path/to/file"
+        );
+    }
+
+    #[test]
+    fn test_firmware_xl_config() {
+        assert_eq!(Firmware::Bios.xl_config(), "firmware=bios");
+        assert_eq!(Firmware::Uefi.xl_config(), "firmware=uefi");
+        assert_eq!(Firmware::Seabios.xl_config(), "firmware=seabios");
+        assert_eq!(Firmware::Rombios.xl_config(), "firmware=rombios");
+        assert_eq!(Firmware::Ovmf.xl_config(), "firmware=ovmf");
+        assert_eq!(
+            Firmware::Path(PathBuf::from("/path/to/file")).xl_config(),
+            "firmware=/path/to/file"
+        );
     }
 }

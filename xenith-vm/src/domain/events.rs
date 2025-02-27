@@ -20,6 +20,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 use std::fmt::Display;
 
+use crate::XlConfiguration;
+
 /// Represents the action to take when a domain event occurs
 #[derive(Debug, Clone, Default, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub enum EventAction {
@@ -94,5 +96,60 @@ impl Display for DomainActions {
             "on_poweroff={}, on_reboot={}, on_watchdog={}, on_crash={}, on_soft_reset={}",
             self.on_poweroff, self.on_reboot, self.on_watchdog, self.on_crash, self.on_soft_reset
         )
+    }
+}
+
+impl XlConfiguration for DomainActions {
+    fn xl_config(&self) -> String {
+        // take display output and replace commas with newlines
+        self.to_string().replace(", ", "\n")
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_event_action_display() {
+        assert_eq!(EventAction::Destroy.to_string(), "destroy");
+        assert_eq!(EventAction::Restart.to_string(), "restart");
+        assert_eq!(EventAction::RenameRestart.to_string(), "rename-restart");
+        assert_eq!(EventAction::Preserve.to_string(), "preserve");
+        assert_eq!(EventAction::CoreDumpDestroy.to_string(), "coredump-destroy");
+        assert_eq!(EventAction::CoreDumpRestart.to_string(), "coredump-restart");
+        assert_eq!(EventAction::SoftReset.to_string(), "soft-reset");
+    }
+
+    #[test]
+    fn test_domain_actions_display() {
+        let domain_actions = DomainActions {
+            on_poweroff: EventAction::Destroy,
+            on_reboot: EventAction::Restart,
+            on_watchdog: EventAction::Destroy,
+            on_crash: EventAction::Destroy,
+            on_soft_reset: EventAction::SoftReset,
+        };
+
+        assert_eq!(
+            domain_actions.to_string(),
+            "on_poweroff=destroy, on_reboot=restart, on_watchdog=destroy, on_crash=destroy, on_soft_reset=soft-reset"
+        );
+    }
+
+    #[test]
+    fn test_domain_actions_xl_config() {
+        let domain_actions = DomainActions {
+            on_poweroff: EventAction::Destroy,
+            on_reboot: EventAction::Restart,
+            on_watchdog: EventAction::Destroy,
+            on_crash: EventAction::Destroy,
+            on_soft_reset: EventAction::SoftReset,
+        };
+
+        assert_eq!(
+            domain_actions.xl_config(),
+            "on_poweroff=destroy\non_reboot=restart\non_watchdog=destroy\non_crash=destroy\non_soft_reset=soft-reset"
+        );
     }
 }

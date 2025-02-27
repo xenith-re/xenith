@@ -124,9 +124,9 @@ pub struct Domain {
     /// (this assumes guest kernel support for ballooning)
     maximum_memory: u64,
     /// Disk devices attached to the virtual machine
-    disks: Vec<Disk>,
+    disks: DiskDevices,
     /// List of network interfaces attached to the virtual machine
-    network_interfaces: Vec<NetworkInterface>,
+    network_interfaces: NetworkInterfaces,
     /// Actions to take when a domain event occurs
     domain_actions: DomainActions,
     /// The firmware to use for the virtual machine
@@ -136,7 +136,7 @@ pub struct Domain {
     /// **Note**: multiple options can be given and will be attempted in the order they are
     /// given, e.g. to boot from CD-ROM but fall back to the hard disk you can specify it
     /// as dc.
-    boot_device: Vec<BootDevice>,
+    boot_device: BootDevices,
     /// Specifies the type of emulated disk controller to use.
     emulated_disk_controller: EmulatedDiskControllerType,
     /// Alternative p2m (altp2m) allows external monitoring of guest memory

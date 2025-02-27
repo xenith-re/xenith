@@ -18,6 +18,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 //! Time configuration structures and options for a domain.
 
+use std::fmt::Display;
+
+use crate::XlConfiguration;
+
 /// Represents the mode of the Time Stamp Counter (TSC) for a domain
 ///
 /// See `man 7 xen-tscmode` for more information.
@@ -43,4 +47,51 @@ pub enum TimeStampCounterMode {
     /// guarantees). Guest rdtsc/p is emulated at native frequency if unsupported by
     /// h/w, else executed natively.
     Native,
+}
+
+impl Display for TimeStampCounterMode {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            TimeStampCounterMode::Default => write!(f, "default"),
+            TimeStampCounterMode::AlwaysEmulate => write!(f, "always_emulate"),
+            TimeStampCounterMode::Native => write!(f, "native"),
+        }
+    }
+}
+
+impl XlConfiguration for TimeStampCounterMode {
+    fn xl_config(&self) -> String {
+        format!("tsc_mode=\"{}\"", self)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_tsc_mode_display() {
+        assert_eq!(format!("{}", TimeStampCounterMode::Default), "default");
+        assert_eq!(
+            format!("{}", TimeStampCounterMode::AlwaysEmulate),
+            "always_emulate"
+        );
+        assert_eq!(format!("{}", TimeStampCounterMode::Native), "native");
+    }
+
+    #[test]
+    fn test_tsc_mode_xl_config() {
+        assert_eq!(
+            TimeStampCounterMode::Default.xl_config(),
+            "tsc_mode=\"default\""
+        );
+        assert_eq!(
+            TimeStampCounterMode::AlwaysEmulate.xl_config(),
+            "tsc_mode=\"always_emulate\""
+        );
+        assert_eq!(
+            TimeStampCounterMode::Native.xl_config(),
+            "tsc_mode=\"native\""
+        );
+    }
 }

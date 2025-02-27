@@ -18,7 +18,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 //! Processor and platforms configuration structures and options for a domain.
 
-use crate::error::CpuidError;
+use crate::{error::CpuidError, XlConfiguration};
 
 use std::fmt::Display;
 
@@ -88,26 +88,26 @@ impl Display for CpuidFeatureBit {
 #[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub struct Cpuid {
     /// The CPUID feature bit for the hypervisor
-    hypervisor: CpuidFeatureBit,
+    pub hypervisor: CpuidFeatureBit,
     /// The vendor info is a 12-byte (96 bit) long string, which is used to
     /// identify the vendor of the CPU. This is used by some software to
     /// determine the CPU vendor, and can be used to detect if the CPU is
     /// running in a virtual machine.
-    vendor: [u8; 12],
+    pub vendor: [u8; 12],
     /// Processor Brand String is a 48-byte (384 bit) long string, which is
     /// used to identify the brand of the CPU. This is used by some software
     /// to determine the CPU brand, and can be used to detect if the CPU is
     /// running in a virtual machine.
     ///
     /// See https://en.wikipedia.org/wiki/CPUID#EAX=8000'0002h,8000'0003h,8000'0004h:_Processor_Brand_String
-    processor_brand_string: [u8; 48],
+    pub processor_brand_string: [u8; 48],
     /// The hypervisor brand is a 12-byte (96 bit) long string, which is used
     /// to identify the brand of the hypervisor. This is used by some software
     /// to determine the hypervisor brand, and can be used to detect if the CPU
     /// is running in a virtual machine.
     ///
     /// See https://en.wikipedia.org/wiki/CPUID#EAX=4000'0000h-4FFFF'FFFh:_Reserved_for_Hypervisors
-    hypervisor_brand: [u8; 12],
+    pub hypervisor_brand: [u8; 12],
 }
 
 impl Default for Cpuid {
@@ -178,5 +178,141 @@ pub struct SmBios {
     pub enclosure_asset_tag: Option<String>,
     pub battery_manufacturer: Option<String>,
     pub battery_device_name: Option<String>,
-    pub oems: Vec<String>,
+    pub oems: Option<Vec<String>>,
+}
+
+impl Display for SmBios {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let fields = [
+            ("bios_vendor", &self.bios_vendor),
+            ("bios_version", &self.bios_version),
+            ("system_manufacturer", &self.system_manufacturer),
+            ("system_product_name", &self.system_product_name),
+            ("system_version", &self.system_version),
+            ("system_serial_number", &self.system_serial_number),
+            ("baseboard_manufacturer", &self.baseboard_manufacturer),
+            ("baseboard_product_name", &self.baseboard_product_name),
+            ("baseboard_version", &self.baseboard_version),
+            ("baseboard_serial_number", &self.baseboard_serial_number),
+            ("baseboard_asset_tag", &self.baseboard_asset_tag),
+            (
+                "baseboard_location_in_chassis",
+                &self.baseboard_location_in_chassis,
+            ),
+            ("enclosure_manufacturer", &self.enclosure_manufacturer),
+            ("enclosure_serial_number", &self.enclosure_serial_number),
+            ("enclosure_asset_tag", &self.enclosure_asset_tag),
+            ("battery_manufacturer", &self.battery_manufacturer),
+            ("battery_device_name", &self.battery_device_name),
+        ];
+
+        // oem is a special case, as it is a list of "oem=value" pairs
+        // for example, if oems = ["Xenith", "Xenith VM"], then the string
+        // representation should be "oem=Xenith, oem=Xenith VM"
+        let mut oems_str = String::new();
+        for oem in self.oems.iter().flatten() {
+            oems_str.push_str(&format!("oem={}, ", oem));
+        }
+        oems_str.pop();
+        oems_str.pop();
+
+        let mut smbios_str = fields
+            .iter()
+            .filter_map(|(name, value)| value.as_deref().map(|v| format!("{}={}", name, v)))
+            .collect::<Vec<String>>();
+
+        smbios_str.push(oems_str);
+
+        if smbios_str.is_empty() {
+            write!(f, "")
+        } else {
+            write!(f, "{}", smbios_str.join(", "))
+        }
+    }
+}
+
+impl XlConfiguration for SmBios {
+    // smbios=[ "SMBIOS_SPEC_STRING", "SMBIOS_SPEC_STRING", ...]
+    fn xl_config(&self) -> String {
+        // add quotes around each smbios spec string
+        let smbios_str = self.to_string().replace(", ", "\", \"");
+        format!("smbios=[ {} ]", smbios_str)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_alternate2pm_mode_display() {
+        assert_eq!(Alternate2pmMode::Disabled.to_string(), "disabled");
+        assert_eq!(Alternate2pmMode::Mixed.to_string(), "mixed");
+        assert_eq!(Alternate2pmMode::External.to_string(), "external");
+        assert_eq!(Alternate2pmMode::Limited.to_string(), "limited");
+    }
+
+    #[test]
+    fn test_cpuid_feature_bit_display() {
+        assert_eq!(CpuidFeatureBit::Force1.to_string(), "1");
+        assert_eq!(CpuidFeatureBit::Force0.to_string(), "0");
+        assert_eq!(CpuidFeatureBit::SafeValue.to_string(), "x");
+        assert_eq!(CpuidFeatureBit::Passthrough.to_string(), "k");
+    }
+
+    // #[test]
+    // fn test_cpuid_display() {
+    //     let cpuid = Cpuid {
+    //         hypervisor: CpuidFeatureBit::Force0,
+    //         vendor: [0; 12],
+    //         processor_brand_string: [0; 48],
+    //         hypervisor_brand: [0; 12],
+    //     };
+
+    //     assert_eq!(
+    //         cpuid.to_string(),
+    //         "hypervisor=0, vendor=, processor_brand_string=, hypervisor_brand="
+    //     );
+    // }
+
+    #[test]
+    fn test_cpuid_new_hidden() -> Result<(), CpuidError> {
+        let cpuid = Cpuid::new_hidden()?;
+
+        assert_eq!(cpuid.hypervisor, CpuidFeatureBit::Force0);
+        assert_eq!(cpuid.vendor, [0; 12]);
+        assert_eq!(cpuid.processor_brand_string, [0; 48]);
+        assert_eq!(cpuid.hypervisor_brand, [0; 12]);
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_smbios_display() {
+        let smbios = SmBios {
+            bios_vendor: Some("Xenith".to_string()),
+            bios_version: Some("1.0".to_string()),
+            system_manufacturer: Some("Xenith".to_string()),
+            system_product_name: Some("Xenith VM".to_string()),
+            system_version: Some("1.0".to_string()),
+            system_serial_number: Some("123".to_string()),
+            baseboard_manufacturer: Some("Xenith".to_string()),
+            baseboard_product_name: Some("Xenith VM".to_string()),
+            baseboard_version: Some("1.0".to_string()),
+            baseboard_serial_number: Some("123".to_string()),
+            baseboard_asset_tag: Some("123".to_string()),
+            baseboard_location_in_chassis: Some("123".to_string()),
+            enclosure_manufacturer: Some("Xenith".to_string()),
+            enclosure_serial_number: Some("123".to_string()),
+            enclosure_asset_tag: Some("123".to_string()),
+            battery_manufacturer: Some("Xenith".to_string()),
+            battery_device_name: Some("Xenith VM".to_string()),
+            oems: Some(vec!["Xenith".to_string(), "Xenith VM".to_string()]),
+        };
+
+        assert_eq!(
+            smbios.to_string(),
+            "bios_vendor=Xenith, bios_version=1.0, system_manufacturer=Xenith, system_product_name=Xenith VM, system_version=1.0, system_serial_number=123, baseboard_manufacturer=Xenith, baseboard_product_name=Xenith VM, baseboard_version=1.0, baseboard_serial_number=123, baseboard_asset_tag=123, baseboard_location_in_chassis=123, enclosure_manufacturer=Xenith, enclosure_serial_number=123, enclosure_asset_tag=123, battery_manufacturer=Xenith, battery_device_name=Xenith VM, oem=Xenith, oem=Xenith VM"
+        );
+    }
 }
