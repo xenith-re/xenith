@@ -1,7 +1,6 @@
 ---
-title: Scripting API
+title: Xen
 type: docs
-weight: 20
 ---
 
 This part of documentation is to be written.

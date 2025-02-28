@@ -16,7 +16,7 @@ layout: hextra-home
 
 <div class="hx-mb-12">
 {{< hextra/hero-subtitle >}}
-  Lightweight, stealth hypervisor debugger&nbsp;<br class="sm:hx-block hx-hidden" />for researchers and developers based on [Xen](https://xenproject.org/projects/hypervisor/)
+  Lightweight, stealth hypervisor debugger environment&nbsp;<br class="sm:hx-block hx-hidden" />for researchers and developers built on [Xen](https://xenproject.org/projects/hypervisor/)
 {{< /hextra/hero-subtitle >}}
 </div>
 
@@ -26,7 +26,8 @@ layout: hextra-home
 
 <div class="hx-mt-6"></div>
 
-{{< hextra/feature-grid >}}
+<!-- Todo: restore the following with good text -->
+<!-- {{< hextra/feature-grid >}}
   {{< hextra/feature-card
     title="Fast and Full-featured"
     subtitle="Simple and easy to use, yet powerful and feature-rich."
@@ -72,4 +73,4 @@ layout: hextra-home
     icon="sparkles"
     subtitle="Syntax highlighting / Table of contents / SEO / RSS / LaTeX / Mermaid / Customizable / and more..."
   >}}
-{{< /hextra/feature-grid >}}
+{{< /hextra/feature-grid >}} -->

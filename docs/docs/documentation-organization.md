@@ -4,7 +4,7 @@ type: docs
 weight: 1
 ---
 
-This documentation tries to follow the [Diátaxis](https://diataxis.fr/) documentation structure, which is a systematic approach to technical documentation authoring.
+This documentation tries to follow the [Diátaxis](https://diataxis.fr/) documentation structure, which is a systematic approach to technical documentation authoring. The only exception it [development documentation](../development) which we choose not to be part of the Diátaxis structure, but it is a common part of the software documentation.
 
 <img class="center" src="https://diataxis.fr/_images/diataxis.png" alt="Diátaxis documentation structure"/>
 

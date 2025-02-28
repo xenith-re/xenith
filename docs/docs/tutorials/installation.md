@@ -1,7 +1,7 @@
 ---
-title: Scripting API
+title: Installation
 type: docs
-weight: 20
+weight: 10
 ---
 
 This part of documentation is to be written.
