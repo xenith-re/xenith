@@ -5,8 +5,8 @@ description = "Library for interacting with Xen. Allows to easily create and man
 version = "0.1.0"
 edition = "2021"
 
-homepage = "<https://theo-abel.github.io/xenith/>"
-repository = "<https://github.com/theo-abel/xenith/>"
+homepage = "<https://xenith.re>"
+repository = "<https://github.com/xenith-re/xenith/>"
 
 keywords = ["virtualization", "detection"]
 license = "GPL-3.0"
