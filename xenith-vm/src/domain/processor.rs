@@ -141,7 +141,9 @@ impl XlConfiguration for SmBios {
     // smbios=[ "SMBIOS_SPEC_STRING", "SMBIOS_SPEC_STRING", ...]
     fn xl_config(&self) -> String {
         // add quotes around each smbios spec string
-        let smbios_str = self.to_string().replace(", ", "\", \"");
+        let mut smbios_str = self.to_string().replace(", ", "\", \"");
+        smbios_str.insert(0, '"');
+        smbios_str.push('"');
         format!("smbios=[ {} ]", smbios_str)
     }
 }
@@ -184,6 +186,35 @@ mod tests {
         assert_eq!(
             smbios.to_string(),
             "bios_vendor=Xenith, bios_version=1.0, system_manufacturer=Xenith, system_product_name=Xenith VM, system_version=1.0, system_serial_number=123, baseboard_manufacturer=Xenith, baseboard_product_name=Xenith VM, baseboard_version=1.0, baseboard_serial_number=123, baseboard_asset_tag=123, baseboard_location_in_chassis=123, enclosure_manufacturer=Xenith, enclosure_serial_number=123, enclosure_asset_tag=123, battery_manufacturer=Xenith, battery_device_name=Xenith VM, oem=Xenith, oem=Xenith VM"
+        );
+    }
+
+    #[test]
+    fn test_smbios_xl_config() {
+        let smbios = SmBios {
+            bios_vendor: Some("Xenith".to_string()),
+            bios_version: Some("1.0".to_string()),
+            system_manufacturer: Some("Xenith".to_string()),
+            system_product_name: Some("Xenith VM".to_string()),
+            system_version: Some("1.0".to_string()),
+            system_serial_number: Some("123".to_string()),
+            baseboard_manufacturer: Some("Xenith".to_string()),
+            baseboard_product_name: Some("Xenith VM".to_string()),
+            baseboard_version: Some("1.0".to_string()),
+            baseboard_serial_number: Some("123".to_string()),
+            baseboard_asset_tag: Some("123".to_string()),
+            baseboard_location_in_chassis: Some("123".to_string()),
+            enclosure_manufacturer: Some("Xenith".to_string()),
+            enclosure_serial_number: Some("123".to_string()),
+            enclosure_asset_tag: Some("123".to_string()),
+            battery_manufacturer: Some("Xenith".to_string()),
+            battery_device_name: Some("Xenith VM".to_string()),
+            oems: Some(vec!["Xenith".to_string(), "Xenith VM".to_string()]),
+        };
+
+        assert_eq!(
+            smbios.xl_config(),
+            "smbios=[ \"bios_vendor=Xenith\", \"bios_version=1.0\", \"system_manufacturer=Xenith\", \"system_product_name=Xenith VM\", \"system_version=1.0\", \"system_serial_number=123\", \"baseboard_manufacturer=Xenith\", \"baseboard_product_name=Xenith VM\", \"baseboard_version=1.0\", \"baseboard_serial_number=123\", \"baseboard_asset_tag=123\", \"baseboard_location_in_chassis=123\", \"enclosure_manufacturer=Xenith\", \"enclosure_serial_number=123\", \"enclosure_asset_tag=123\", \"battery_manufacturer=Xenith\", \"battery_device_name=Xenith VM\", \"oem=Xenith\", \"oem=Xenith VM\" ]"
         );
     }
 }
