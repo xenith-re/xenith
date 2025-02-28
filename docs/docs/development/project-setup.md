@@ -1,5 +1,5 @@
 ---
-title: Getting started
+title: Project setup
 type: docs
 weight: 10
 ---
