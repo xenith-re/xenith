@@ -20,7 +20,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 use std::fmt::Display;
 
-use mac_address::MacAddress;
+pub use mac_address::MacAddress;
 
 use crate::XlConfiguration;
 
@@ -84,7 +84,7 @@ pub struct NetworkInterface {
     /// The default name for the virtual device is "vifDOMID.DEVID" where "DOMID" is the
     /// guest domain ID and "DEVID" is the device number. Likewise the default tap name is
     /// "vifDOMID.DEVID-emu".
-    name: String,
+    pub name: String,
     /// If specified then this option specifies the MAC address inside the guest of this VIF
     /// device. The value is a 48-bit number represented as six groups of two hexadecimal
     /// digits, separated by colons (:).
@@ -112,24 +112,24 @@ pub struct NetworkInterface {
     /// If you have an OUI for your own use then that is the preferred strategy. Otherwise in
     /// general you should prefer to generate a random MAC and set the locally administered
     /// bit since this allows for more bits of randomness than using the Xen OUI.
-    mac: MacAddress,
+    pub mac: MacAddress,
     /// Specifies the name of the network bridge which this VIF should be added to. The
     /// default is "xenbr0". The bridge must be configured using your distribution's network
     /// configuration tools. See the [wiki](https://wiki.xenproject.org/wiki/Network_Configuration_Examples_(Xen_4.1%2B)) for
     /// guidance and examples.
-    bridge: String,
+    pub bridge: String,
     /// Specifies the name of the network interface which has an IP and which is in the
     /// network the VIF should communicate with. This is used in the host by the vif-route
     /// hotplug script. See [wiki](https://wiki.xenproject.org/wiki/Vif-route) for guidance
     /// and examples.
-    gateway_device: String,
+    pub gateway_device: String,
     /// The type of network interface to use.
     /// ⚠️ Only available for HVM guests.
-    r#type: NetworkInterfaceType,
+    pub r#type: NetworkInterfaceType,
     /// The model of network interface to use.
     /// Only valid if `type` is `IoEmu`.
     /// ⚠️ Only available for HVM guests.
-    model: Option<NetworkInterfaceModel>,
+    pub model: Option<NetworkInterfaceModel>,
 }
 
 impl Default for NetworkInterface {
@@ -161,7 +161,7 @@ impl Display for NetworkInterface {
 
 /// Represents a list of network interfaces attached to a domain.
 #[derive(Debug, Clone, Default, Eq, PartialEq, Ord, PartialOrd, Hash)]
-pub struct NetworkInterfaces(Vec<NetworkInterface>);
+pub struct NetworkInterfaces(pub Vec<NetworkInterface>);
 
 impl XlConfiguration for NetworkInterfaces {
     // vif=[ "NET_SPEC_STRING", "NET_SPEC_STRING", ...]
@@ -173,7 +173,7 @@ impl XlConfiguration for NetworkInterfaces {
         }
         vifs.pop();
         vifs.pop();
-        format!("disk=[ {} ]", vifs)
+        format!("vif = [ {} ]", vifs)
     }
 }
 
@@ -238,7 +238,7 @@ mod tests {
 
         assert_eq!(
             network_interfaces.xl_config(),
-            "disk=[ \"mac=00:16:3E:00:00:00, bridge=xenbr0, gateway=eth0, type=ioemu, model=rtl8139\", \"mac=00:16:3E:00:00:01, bridge=xenbr0, gateway=eth0, type=ioemu, model=rtl8139\" ]"
+            "vif = [ \"mac=00:16:3E:00:00:00, bridge=xenbr0, gateway=eth0, type=ioemu, model=rtl8139\", \"mac=00:16:3E:00:00:01, bridge=xenbr0, gateway=eth0, type=ioemu, model=rtl8139\" ]"
         );
     }
 }

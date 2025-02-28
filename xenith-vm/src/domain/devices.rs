@@ -88,18 +88,18 @@ impl Display for DiskAccess {
 pub struct Disk {
     /// Block device or image file path.  When this is used as a path, /dev will be
     /// prepended if the path doesn't start with a '/'.
-    target: PathBuf,
+    pub target: PathBuf,
     /// Size of the disk in bytes.  This is required for file-based disk images.
-    size: u64,
+    pub size: u64,
     /// Specifies the format of image file. See [`DiskFormat`] for more information.
-    format: DiskFormat,
+    pub format: DiskFormat,
     /// Specified access control information. Whether or not the block device is
     /// provided to the guest in read-only or read-write mode depends on this
     /// attribute.
-    access: DiskAccess,
+    pub access: DiskAccess,
     /// Virtual device as seen by the guest (also referred to as guest drive
     /// designation in some specifications).  See xen-vbd-interface(7).
-    virtual_device: String,
+    pub virtual_device: String,
 }
 
 impl Display for Disk {
@@ -121,7 +121,7 @@ impl Display for Disk {
 /// Represents a list of disk devices attached to a virtual machine
 /// The disk devices can be used for storing the operating system, data, or other files.
 #[derive(Debug, Clone, Default, Eq, PartialEq, Ord, PartialOrd, Hash)]
-pub struct DiskDevices(Vec<Disk>);
+pub struct DiskDevices(pub Vec<Disk>);
 
 impl XlConfiguration for DiskDevices {
     // disk=[ "DISK_SPEC_STRING", "DISK_SPEC_STRING", ...]
@@ -132,7 +132,7 @@ impl XlConfiguration for DiskDevices {
         }
         disks.pop();
         disks.pop();
-        format!("disk=[ {} ]", disks)
+        format!("disk = [ {} ]", disks)
     }
 }
 
@@ -159,7 +159,7 @@ impl Display for BootDevice {
 
 /// Represents the list of boot devices for the virtual machine
 #[derive(Debug, Clone, Default, Eq, PartialEq, Ord, PartialOrd, Hash)]
-pub struct BootDevices(Vec<BootDevice>);
+pub struct BootDevices(pub Vec<BootDevice>);
 
 impl XlConfiguration for BootDevices {
     // boot="BOOT_DEVICE_STRING"
@@ -168,7 +168,7 @@ impl XlConfiguration for BootDevices {
         for boot_device in &self.0 {
             boot_devices.push_str(&format!("{}", boot_device));
         }
-        format!("boot=\"{}\"", boot_devices)
+        format!("boot = \"{}\"", boot_devices)
     }
 }
 
@@ -198,7 +198,7 @@ impl Display for EmulatedDiskControllerType {
 impl XlConfiguration for EmulatedDiskControllerType {
     // hdtype="DISK_CONTROLLER_TYPE"
     fn xl_config(&self) -> String {
-        format!("hdtype=\"{}\"", self)
+        format!("hdtype = \"{}\"", self)
     }
 }
 
@@ -255,7 +255,7 @@ mod tests {
         let disk_devices = DiskDevices(vec![disk1, disk2]);
         assert_eq!(
             disk_devices.xl_config(),
-            "disk=[ \"format=qcow2, vdev=xvda, access=rw, target=/dev/sda\", \"format=raw, vdev=xvdb, access=ro, target=/dev/sdb\" ]"
+            "disk = [ \"format=qcow2, vdev=xvda, access=rw, target=/dev/sda\", \"format=raw, vdev=xvdb, access=ro, target=/dev/sdb\" ]"
         );
     }
 
@@ -273,7 +273,7 @@ mod tests {
             BootDevice::CdRom,
             BootDevice::Network,
         ]);
-        assert_eq!(boot_devices.xl_config(), "boot=\"cdn\"");
+        assert_eq!(boot_devices.xl_config(), "boot = \"cdn\"");
     }
 
     #[test]
@@ -285,6 +285,6 @@ mod tests {
     #[test]
     fn test_emulated_disk_controller_type_xl_config() {
         let disk_controller = EmulatedDiskControllerType::Ahci;
-        assert_eq!(disk_controller.xl_config(), "hdtype=\"ahci\"");
+        assert_eq!(disk_controller.xl_config(), "hdtype = \"ahci\"");
     }
 }

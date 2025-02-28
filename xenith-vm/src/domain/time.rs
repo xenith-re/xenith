@@ -61,7 +61,7 @@ impl Display for TimeStampCounterMode {
 
 impl XlConfiguration for TimeStampCounterMode {
     fn xl_config(&self) -> String {
-        format!("tsc_mode=\"{}\"", self)
+        format!("tsc_mode = \"{}\"", self)
     }
 }
 
@@ -83,15 +83,15 @@ mod tests {
     fn test_tsc_mode_xl_config() {
         assert_eq!(
             TimeStampCounterMode::Default.xl_config(),
-            "tsc_mode=\"default\""
+            "tsc_mode = \"default\""
         );
         assert_eq!(
             TimeStampCounterMode::AlwaysEmulate.xl_config(),
-            "tsc_mode=\"always_emulate\""
+            "tsc_mode = \"always_emulate\""
         );
         assert_eq!(
             TimeStampCounterMode::Native.xl_config(),
-            "tsc_mode=\"native\""
+            "tsc_mode = \"native\""
         );
     }
 }

@@ -48,6 +48,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 pub mod actions;
 pub mod domain;
 pub mod error;
+pub mod templating;
 
 /// Allows for the generation of the xl domain configuration
 pub trait XlConfiguration {

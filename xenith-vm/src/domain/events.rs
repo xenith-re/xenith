@@ -93,7 +93,7 @@ impl Display for DomainActions {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "on_poweroff={}, on_reboot={}, on_watchdog={}, on_crash={}, on_soft_reset={}",
+            "on_poweroff = \"{}\", on_reboot = \"{}\", on_watchdog = \"{}\", on_crash = \"{}\", on_soft_reset = \"{}\"",
             self.on_poweroff, self.on_reboot, self.on_watchdog, self.on_crash, self.on_soft_reset
         )
     }
@@ -133,7 +133,7 @@ mod tests {
 
         assert_eq!(
             domain_actions.to_string(),
-            "on_poweroff=destroy, on_reboot=restart, on_watchdog=destroy, on_crash=destroy, on_soft_reset=soft-reset"
+            "on_poweroff = \"destroy\", on_reboot = \"restart\", on_watchdog = \"destroy\", on_crash = \"destroy\", on_soft_reset = \"soft-reset\""
         );
     }
 
@@ -149,7 +149,7 @@ mod tests {
 
         assert_eq!(
             domain_actions.xl_config(),
-            "on_poweroff=destroy\non_reboot=restart\non_watchdog=destroy\non_crash=destroy\non_soft_reset=soft-reset"
+            "on_poweroff = \"destroy\"\non_reboot = \"restart\"\non_watchdog = \"destroy\"\non_crash = \"destroy\"\non_soft_reset = \"soft-reset\""
         );
     }
 }

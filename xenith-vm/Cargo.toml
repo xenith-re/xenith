@@ -13,7 +13,10 @@ license = "GPL-3.0"
 
 authors = ["abel <67806187+theo-abel@users.noreply.github.com>"]
 
+include = ["src/templates/"]
+
 [dependencies]
+log = "0.4.26"
 mac_address = "1.1.8"
-raw-cpuid = "11.4.0"
+tera = { version = "1.20.0", default-features = false }
 thiserror = "2.0.11"

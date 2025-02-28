@@ -65,7 +65,7 @@ impl Display for Firmware {
 
 impl XlConfiguration for Firmware {
     fn xl_config(&self) -> String {
-        format!("firmware={}", self)
+        format!("firmware = \"{}\"", self)
     }
 }
 
@@ -88,14 +88,14 @@ mod tests {
 
     #[test]
     fn test_firmware_xl_config() {
-        assert_eq!(Firmware::Bios.xl_config(), "firmware=bios");
-        assert_eq!(Firmware::Uefi.xl_config(), "firmware=uefi");
-        assert_eq!(Firmware::Seabios.xl_config(), "firmware=seabios");
-        assert_eq!(Firmware::Rombios.xl_config(), "firmware=rombios");
-        assert_eq!(Firmware::Ovmf.xl_config(), "firmware=ovmf");
+        assert_eq!(Firmware::Bios.xl_config(), "firmware = \"bios\"");
+        assert_eq!(Firmware::Uefi.xl_config(), "firmware = \"uefi\"");
+        assert_eq!(Firmware::Seabios.xl_config(), "firmware = \"seabios\"");
+        assert_eq!(Firmware::Rombios.xl_config(), "firmware = \"rombios\"");
+        assert_eq!(Firmware::Ovmf.xl_config(), "firmware = \"ovmf\"");
         assert_eq!(
             Firmware::Path(PathBuf::from("/path/to/file")).xl_config(),
-            "firmware=/path/to/file"
+            "firmware = \"/path/to/file\""
         );
     }
 }

@@ -39,7 +39,7 @@ use std::fmt::Display;
 
 /// Represents the access mode to the alternate-p2m capability
 #[derive(Debug, Clone, Default, Eq, PartialEq, Ord, PartialOrd, Hash)]
-pub enum Alternate2pmMode {
+pub enum AlternateP2mMode {
     /// Altp2m is disabled for the domain
     #[default]
     Disabled,
@@ -53,14 +53,21 @@ pub enum Alternate2pmMode {
     Limited,
 }
 
-impl Display for Alternate2pmMode {
+impl Display for AlternateP2mMode {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Alternate2pmMode::Disabled => write!(f, "disabled"),
-            Alternate2pmMode::Mixed => write!(f, "mixed"),
-            Alternate2pmMode::External => write!(f, "external"),
-            Alternate2pmMode::Limited => write!(f, "limited"),
+            AlternateP2mMode::Disabled => write!(f, "disabled"),
+            AlternateP2mMode::Mixed => write!(f, "mixed"),
+            AlternateP2mMode::External => write!(f, "external"),
+            AlternateP2mMode::Limited => write!(f, "limited"),
         }
+    }
+}
+
+impl XlConfiguration for AlternateP2mMode {
+    // altp2m="ALTP2M_MODE"
+    fn xl_config(&self) -> String {
+        format!("altp2m = \"{}\"", self)
     }
 }
 
@@ -144,7 +151,7 @@ impl XlConfiguration for SmBios {
         let mut smbios_str = self.to_string().replace(", ", "\", \"");
         smbios_str.insert(0, '"');
         smbios_str.push('"');
-        format!("smbios=[ {} ]", smbios_str)
+        format!("smbios = [ {} ]", smbios_str)
     }
 }
 
@@ -153,11 +160,28 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_alternate2pm_mode_display() {
-        assert_eq!(Alternate2pmMode::Disabled.to_string(), "disabled");
-        assert_eq!(Alternate2pmMode::Mixed.to_string(), "mixed");
-        assert_eq!(Alternate2pmMode::External.to_string(), "external");
-        assert_eq!(Alternate2pmMode::Limited.to_string(), "limited");
+    fn test_alternatep2m_mode_display() {
+        assert_eq!(AlternateP2mMode::Disabled.to_string(), "disabled");
+        assert_eq!(AlternateP2mMode::Mixed.to_string(), "mixed");
+        assert_eq!(AlternateP2mMode::External.to_string(), "external");
+        assert_eq!(AlternateP2mMode::Limited.to_string(), "limited");
+    }
+
+    #[test]
+    fn test_alternatep2m_mode_xl_config() {
+        assert_eq!(
+            AlternateP2mMode::Disabled.xl_config(),
+            "altp2m = \"disabled\""
+        );
+        assert_eq!(AlternateP2mMode::Mixed.xl_config(), "altp2m = \"mixed\"");
+        assert_eq!(
+            AlternateP2mMode::External.xl_config(),
+            "altp2m = \"external\""
+        );
+        assert_eq!(
+            AlternateP2mMode::Limited.xl_config(),
+            "altp2m = \"limited\""
+        );
     }
 
     #[test]
@@ -214,7 +238,7 @@ mod tests {
 
         assert_eq!(
             smbios.xl_config(),
-            "smbios=[ \"bios_vendor=Xenith\", \"bios_version=1.0\", \"system_manufacturer=Xenith\", \"system_product_name=Xenith VM\", \"system_version=1.0\", \"system_serial_number=123\", \"baseboard_manufacturer=Xenith\", \"baseboard_product_name=Xenith VM\", \"baseboard_version=1.0\", \"baseboard_serial_number=123\", \"baseboard_asset_tag=123\", \"baseboard_location_in_chassis=123\", \"enclosure_manufacturer=Xenith\", \"enclosure_serial_number=123\", \"enclosure_asset_tag=123\", \"battery_manufacturer=Xenith\", \"battery_device_name=Xenith VM\", \"oem=Xenith\", \"oem=Xenith VM\" ]"
+            "smbios = [ \"bios_vendor=Xenith\", \"bios_version=1.0\", \"system_manufacturer=Xenith\", \"system_product_name=Xenith VM\", \"system_version=1.0\", \"system_serial_number=123\", \"baseboard_manufacturer=Xenith\", \"baseboard_product_name=Xenith VM\", \"baseboard_version=1.0\", \"baseboard_serial_number=123\", \"baseboard_asset_tag=123\", \"baseboard_location_in_chassis=123\", \"enclosure_manufacturer=Xenith\", \"enclosure_serial_number=123\", \"enclosure_asset_tag=123\", \"battery_manufacturer=Xenith\", \"battery_device_name=Xenith VM\", \"oem=Xenith\", \"oem=Xenith VM\" ]"
         );
     }
 }
