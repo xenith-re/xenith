@@ -16,7 +16,7 @@ You may now wonder, what makes Xenith special and useful ?
 - **Snapshot and restore**: Simplify your testing process with snapshot capabilities. Capture the state of your system and revert back whenever you need to.
 - **Open-source collaboration**: We believe in the power of community-driven development. Xenith is open-source, allowing everyone to contribute and innovate together.
 
-If you want to learn more about Xenith, check the [documentation organization](documentation.md) and start exploring the project.
+If you want to learn more about Xenith, check the [documentation organization](documentation-organization) and start exploring the project.
 
 ## Community
 
