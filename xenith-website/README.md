@@ -13,7 +13,7 @@ Pre-requisites: [Hugo](https://gohugo.io/getting-started/installing/), [Go](http
 git clone git@github.com:xenith-re/xenith.git
 
 # Change directory
-cd xenith/xenith-website
+cd xenith
 
 # Start the server
 hugo server --logLevel debug --buildDrafts --disableFastRender --source xenith-website/
