@@ -13,4 +13,4 @@ weight: 102
 
 No project would be possible without the help of the following people:
 
-- nobody :(
+- to be added

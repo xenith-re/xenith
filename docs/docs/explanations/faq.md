@@ -1,7 +1,7 @@
 ---
 title: FAQ
 type: docs
-weight: 100
+weight: 40
 ---
 
 This document is a collection of decisions made during the development of Xenith and the reasoning behind them.
