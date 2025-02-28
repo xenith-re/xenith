@@ -1,5 +1,5 @@
 <p>
-    <img src="docs/src/assets/xenith-banner-rounded.png" alt="Xenith banner" width="100%">
+    <img src="xenith-website/static/xenith-banner-rounded.png" alt="Xenith banner" width="100%">
 </p>
 <div align="left">
     <h1>Xenith</h1>
@@ -27,24 +27,17 @@ With an intuitive graphical interface and robust scripting API, Xen ensures flex
 
 ## 🧩 Usage
 
-See the [introduction](https://theo-abel.github.io/xenith/index.html) guide for detailed instructions on building and running Xenith.
+See the [introduction](https://xenith.re/docs/tutorials/getting-started/) guide for detailed instructions on building and running Xenith.
 
 ## 📚 Documentation
 
-You can view the full online documentation [here](https://theo-abel.github.io/xenith/) or build it locally using `mdbook`.
+You can view the full online documentation [here](https://xenith.re) or build it locally using `hugo`.
 
-```shell
-$ cargo install mdbook mdbook-mermaid mdbook-admonish
-$ mdbook serve docs
-...
-2025-01-28 00:03:35 [INFO] (warp::server): listening on http://[::1]:3000
-```
-
-You can now view the built book by navigating to [http://localhost:3000](http://localhost:3000).
+See [xenith-website](xenith-website) for more information.
 
 ## 🔗 Credits
 
-See documentation [credits](https://theo-abel.github.io/xenith/credits.html).
+See documentation [credits](https://xenith.re/docs/credits/).
 
 ## 📜 License
 
