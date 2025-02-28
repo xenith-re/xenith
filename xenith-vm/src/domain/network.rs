@@ -99,7 +99,7 @@ pub struct NetworkInterface {
     ///     the first byte) and clear the multicast bit (bit 1 of the first byte). In other
     ///     words the first byte should have the bit pattern xxxxxx10 (where x is a randomly
     ///     generated bit) and the remaining 5 bytes are randomly generated See
-    ///     [https://en.wikipedia.org/wiki/MAC_address] for more details the structure of a
+    ///     [Wikipedia](https://en.wikipedia.org/wiki/MAC_address) for more details the structure of a
     ///     MAC address.
     ///
     /// •   Allocate an address from within the space defined by your organization's OUI (if
