@@ -5,8 +5,8 @@ description = "Library and (small) CLI for testing redpills (techniques to detec
 version = "0.1.0"
 edition = "2021"
 
-homepage = "<https://theo-abel.github.io/xenith/>"
-repository = "<https://github.com/theo-abel/xenith/>"
+homepage = "<https://xenith.re>"
+repository = "<https://github.com/xenith-re/xenith/>"
 
 keywords = ["virtualization", "detection"]
 license = "GPL-3.0"

@@ -5,8 +5,8 @@ description = "A CLI tool for interacting with Xen and Xenith tools."
 version = "0.1.0"
 edition = "2021"
 
-homepage = "<https://theo-abel.github.io/xenith/>"
-repository = "<https://github.com/theo-abel/xenith/>"
+homepage = "<https://xenith.re>"
+repository = "<https://github.com/xenith-re/xenith/>"
 
 keywords = ["virtualization", "xenith", "xen", "cli", "tool"]
 license = "GPL-3.0"
