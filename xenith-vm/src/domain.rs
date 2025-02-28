@@ -156,8 +156,6 @@ pub struct Domain {
     /// virtualisation extensions (e.g. Windows XP compatibility mode on more modern
     /// Windows OS).
     nested_hvm: bool,
-    /// Configure the value returned when a guest executes the CPUID instruction.
-    cpuid: Cpuid,
     /// SMBIOS information for the domain
     smbios: SmBios,
     /// Specifies how the TSC (Time Stamp Counter) should be provided to the

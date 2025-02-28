@@ -17,8 +17,23 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
 //! Processor and platforms configuration structures and options for a domain.
+//!
+//! <div class="info">
+//!
+//! You could wonder why we don't directly specify CPUID values in the domain configuration as
+//! xl.cfg allows to do. The reason is that xl, when specifying cpuid for hypervisor leaves
+//! (0x4000xxxx major group) only the lowest 8 bits of leaf's 0x4000xx00 EAX register are processed,
+//! the rest are ignored (these 8 bits signify maximum number of hypervisor leaves).
+//!
+//! This is an important limitation, as we need to hook the hypervisor leaves to hide the fact that
+//! the CPU is running in a virtual machine. To do this, we need to specify the full leaf value.
+//!
+//! If this changes, we could add it back with the `Xend` format, as the `Libxl` format does not allow
+//! to specify the full leaf value.
+//!
+//! </div>
 
-use crate::{error::CpuidError, XlConfiguration};
+use crate::XlConfiguration;
 
 use std::fmt::Display;
 
@@ -46,115 +61,6 @@ impl Display for Alternate2pmMode {
             Alternate2pmMode::External => write!(f, "external"),
             Alternate2pmMode::Limited => write!(f, "limited"),
         }
-    }
-}
-
-/// Represents the notation for a CPUID feature bit
-#[derive(Debug, Clone, Default, Eq, PartialEq, Ord, PartialOrd, Hash)]
-pub enum CpuidFeatureBit {
-    /// Force the corresponding bit to 1
-    Force1,
-    /// Force the corresponding bit to 0
-    Force0,
-    /// Get a safe value (pass through and mask with the default policy)
-    SafeValue,
-    /// pass through the host bit value (at boot only - value preserved on
-    /// migrate)
-    #[default]
-    Passthrough,
-}
-
-impl Display for CpuidFeatureBit {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            CpuidFeatureBit::Force1 => write!(f, "1"),
-            CpuidFeatureBit::Force0 => write!(f, "0"),
-            CpuidFeatureBit::SafeValue => write!(f, "x"),
-            CpuidFeatureBit::Passthrough => write!(f, "k"),
-        }
-    }
-}
-
-/// The CPUID configuration for a domain
-///
-/// This employs the xend format, which consists of an array of one or more strings of the form
-/// "leaf:reg=bitstring,...".
-///
-/// List of keys taking a character can be found in the public header file:
-/// `xen/include/public/arch-x86/cpufeatureset.h`
-///
-/// This does not implement every possible key, only the most useful ones for
-/// Xenith, mainly for evading VM detection.
-#[derive(Debug, Clone, Eq, PartialEq, Ord, PartialOrd, Hash)]
-pub struct Cpuid {
-    /// The CPUID feature bit for the hypervisor
-    pub hypervisor: CpuidFeatureBit,
-    /// The vendor info is a 12-byte (96 bit) long string, which is used to
-    /// identify the vendor of the CPU. This is used by some software to
-    /// determine the CPU vendor, and can be used to detect if the CPU is
-    /// running in a virtual machine.
-    pub vendor: [u8; 12],
-    /// Processor Brand String is a 48-byte (384 bit) long string, which is
-    /// used to identify the brand of the CPU. This is used by some software
-    /// to determine the CPU brand, and can be used to detect if the CPU is
-    /// running in a virtual machine.
-    ///
-    /// See https://en.wikipedia.org/wiki/CPUID#EAX=8000'0002h,8000'0003h,8000'0004h:_Processor_Brand_String
-    pub processor_brand_string: [u8; 48],
-    /// The hypervisor brand is a 12-byte (96 bit) long string, which is used
-    /// to identify the brand of the hypervisor. This is used by some software
-    /// to determine the hypervisor brand, and can be used to detect if the CPU
-    /// is running in a virtual machine.
-    ///
-    /// See https://en.wikipedia.org/wiki/CPUID#EAX=4000'0000h-4FFFF'FFFh:_Reserved_for_Hypervisors
-    pub hypervisor_brand: [u8; 12],
-}
-
-impl Default for Cpuid {
-    fn default() -> Self {
-        Self {
-            hypervisor: CpuidFeatureBit::default(),
-            vendor: [0; 12],
-            processor_brand_string: [0; 48],
-            hypervisor_brand: [0; 12],
-        }
-    }
-}
-
-impl Cpuid {
-    /// Create a new *hidden* CPUID configuration with host values.
-    ///
-    /// This is used to hide the fact that the CPU is running in a virtual machine.
-    /// It sets the hypervisor feature bit to 0, and sets the vendor, processor brand string,
-    /// and hypervisor brand to the host values.
-    pub fn new_hidden() -> Result<Self, CpuidError> {
-        let host_cpuid = raw_cpuid::CpuId::new();
-
-        let vendor_info = host_cpuid.get_vendor_info().ok_or(CpuidError::VendorInfo)?;
-        let vendor = vendor_info
-            .as_str()
-            .as_bytes()
-            .try_into()
-            .map_err(|e| CpuidError::ConversionError(format!("Vendor info: {e}")))?;
-
-        let processor_brand_string = host_cpuid
-            .get_processor_brand_string()
-            .ok_or(CpuidError::ProcessorBrandString)?;
-        let processor_brand = processor_brand_string
-            .as_str()
-            .as_bytes()
-            .try_into()
-            .map_err(|e| CpuidError::ConversionError(format!("Processor brand string: {e}")))?;
-
-        // Because there is no hypervisor 😉
-        let hypervisor_brand = [0u8; 12];
-
-        Ok(Self {
-            hypervisor: CpuidFeatureBit::Force0,
-            vendor,
-            processor_brand_string: processor_brand,
-            hypervisor_brand,
-        })
     }
 }
 
@@ -250,41 +156,6 @@ mod tests {
         assert_eq!(Alternate2pmMode::Mixed.to_string(), "mixed");
         assert_eq!(Alternate2pmMode::External.to_string(), "external");
         assert_eq!(Alternate2pmMode::Limited.to_string(), "limited");
-    }
-
-    #[test]
-    fn test_cpuid_feature_bit_display() {
-        assert_eq!(CpuidFeatureBit::Force1.to_string(), "1");
-        assert_eq!(CpuidFeatureBit::Force0.to_string(), "0");
-        assert_eq!(CpuidFeatureBit::SafeValue.to_string(), "x");
-        assert_eq!(CpuidFeatureBit::Passthrough.to_string(), "k");
-    }
-
-    // #[test]
-    // fn test_cpuid_display() {
-    //     let cpuid = Cpuid {
-    //         hypervisor: CpuidFeatureBit::Force0,
-    //         vendor: [0; 12],
-    //         processor_brand_string: [0; 48],
-    //         hypervisor_brand: [0; 12],
-    //     };
-
-    //     assert_eq!(
-    //         cpuid.to_string(),
-    //         "hypervisor=0, vendor=, processor_brand_string=, hypervisor_brand="
-    //     );
-    // }
-
-    #[test]
-    fn test_cpuid_new_hidden() -> Result<(), CpuidError> {
-        let cpuid = Cpuid::new_hidden()?;
-
-        assert_eq!(cpuid.hypervisor, CpuidFeatureBit::Force0);
-        assert_eq!(cpuid.vendor, [0; 12]);
-        assert_eq!(cpuid.processor_brand_string, [0; 48]);
-        assert_eq!(cpuid.hypervisor_brand, [0; 12]);
-
-        Ok(())
     }
 
     #[test]
