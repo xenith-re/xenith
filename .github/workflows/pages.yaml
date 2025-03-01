@@ -31,7 +31,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      HUGO_VERSION: 0.132.2
+      HUGO_VERSION: 0.144.2
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -41,7 +42,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.22'
+          go-version: '1.24'
       - name: Setup Pages
         id: pages
         uses: actions/configure-pages@v4
@@ -62,7 +63,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./public
+          path: ./xenith-website/public
 
   # Deployment job
   deploy:
