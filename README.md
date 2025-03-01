@@ -19,20 +19,17 @@
 
 ## 📦 Features
 
-With an intuitive graphical interface and robust scripting API, Xen ensures flexibility and efficiency for operating system and virtualization research. Its secure design, snapshot capabilities, and open-source nature make it an excellent choice for experimentation and innovation.
-
-- **Stealth**: Tested with our homemade cutting-edge anti-vm framework based on latest researches.
-- **Advanced Debugging Tools**: Comprehensive support for low-level debugging and iterative testing.
-- **Virtual Machine Introspection (VMI)**: Real-time insights into guest activity and resource usage.
-- **Graphical User Interface (GUI)**: Intuitive controls for managing virtual machines and configurations.
-- **Scripting API**: Automation of workflows and custom extensions with ease.
-- **Secure and Isolated Design**: Ensures safe experimentation in multi-tenant environments.
-- **Snapshot and Restore**: Simplifies testing by capturing and reverting system states.
-- **Open-Source Collaboration**: Built for community-driven development and innovation.
+- **Stealth environment**: Xenith is designed with stealth in mind. We're developing a cutting-edge anti-VM framework to ensure your virtualized workloads remain undetected. This is one of the key steps in our project roadmap.
+- **Advanced debugging**: Dive deep into your systems with our comprehensive low-level debugging tools. Whether you're troubleshooting, optimizing or reverse engineering, Xenith has you covered.
+- **Virtual Machine Introspection** (VMI): Get real-time insights into what's happening inside your guest VMs. This feature is invaluable for monitoring and securing your virtual environments. Hook any function, inspect memory, and more.
+- **Powerful scripting API**: Automate your workflows and extend Xenith's capabilities with our robust scripting API. It's designed to be flexible and easy to use.
+- **User-friendly GUI**: Debugging and reverse engineering can be complex tasks. Xenith provides a user-friendly GUI to simplify your workflow and make your life easier.
+- **Snapshot and restore**: Simplify your testing process with snapshot capabilities. Capture the state of your system and revert back whenever you need to.
+- **Open-source collaboration**: We believe in the power of community-driven development. Xenith is open-source, allowing everyone to contribute and innovate together.
 
 ## 🧩 Usage
 
-See the [introduction](https://xenith.re/docs/tutorials/getting-started/) guide for detailed instructions on building and running Xenith.
+See our [tutorials](https://xenith.re/docs/tutorials/) for detailed instructions on building and running Xenith.
 
 ## 📚 Documentation
 
