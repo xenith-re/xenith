@@ -1,3 +1,47 @@
+################################################################################
+# Workspace settings
+################################################################################
+
 [workspace]
 resolver = "2" # see https://doc.rust-lang.org/cargo/reference/resolver.html#resolver-versions
 members = [ "xenith-cli","xenith-redpill", "xenith-vm", "xenith-vmi"]
+exclude = [ "xenith-website" ]
+
+[workspace.package]
+edition = "2024"
+rust-version = "1.85.0"
+license = "GPL-3.0"
+
+version = "0.1.0"
+publish = false
+
+authors = ["abel <67806187+theo-abel@users.noreply.github.com>"]
+
+homepage = "<https://xenith.re>"
+documentation = "<https://xenith.re/docs/>"
+repository = "<https://github.com/xenith-re/xenith/>"
+
+keywords = ["virtualization", "detection", "vmi", "debugger", "xen", "hypervisor"]
+
+[workspace.dependencies]
+# Those dependencies are shared across all packages,
+# so we define them here to avoid duplication.
+log = "0.4.25"
+thiserror = "2.0.11"
+
+################################################################################
+# Profile settings
+################################################################################
+
+[profile.release]
+# enable link-time optimization, which can improve performance
+# but also increase build time
+lto = true
+codegen-units = 1
+opt-level = 3 # use better optimizations
+debug = true # keep debug info in case of crash/bug
+
+[profile.optimized-release]
+inherits = "release"
+debug = false
+strip = true

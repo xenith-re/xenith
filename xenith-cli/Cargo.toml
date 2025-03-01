@@ -2,25 +2,23 @@
 name = "xenith-cli"
 description = "A CLI tool for interacting with Xen and Xenith tools."
 
-version = "0.1.0"
-edition = "2021"
-
-homepage = "<https://xenith.re>"
-repository = "<https://github.com/xenith-re/xenith/>"
-
-keywords = ["virtualization", "xenith", "xen", "cli", "tool"]
-license = "GPL-3.0"
-
-authors = ["abel <67806187+theo-abel@users.noreply.github.com>"]
+# Inherit workspace settings
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+version.workspace = true
+authors.workspace = true
+documentation.workspace = true
 
 [[bin]]
 name = "xenith"
 path = "src/main.rs"
 
 [dependencies]
+log = { workspace = true }
+
 anstyle = "1.0.10"
 clap = { version = "4.5.30", features = ["derive"] }
 clap-verbosity-flag = "3.0.2"
 colog = "1.3.0"
-log = "0.4.25"
 termcolor = "1.4.1"

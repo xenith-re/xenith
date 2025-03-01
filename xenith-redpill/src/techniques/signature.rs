@@ -26,7 +26,7 @@ use raw_cpuid::{CpuId, Hypervisor};
 use static_init::dynamic;
 
 use crate::{
-    detector::{register_technique, DetectionResult, Technique, TechniqueResult},
+    detector::{DetectionResult, Technique, TechniqueResult, register_technique},
     prelude::TechniqueError,
 };
 

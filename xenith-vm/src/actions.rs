@@ -15,22 +15,3 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
-
-use clap::Parser;
-
-mod commands;
-
-use commands::{Cli, handle};
-
-fn main() {
-    let args = Cli::parse();
-
-    // Initialize the logger
-    let log_level = args.verbosity.log_level_filter();
-    let mut clog = colog::default_builder();
-    clog.filter(None, log_level);
-    clog.init();
-
-    // Handle CLI commands
-    handle(args);
-}
