@@ -2,23 +2,21 @@
 name = "xenith-redpill"
 description = "Library and (small) CLI for testing redpills (techniques to detect virtualized environments)."
 
-version = "0.1.0"
-edition = "2021"
-
-homepage = "<https://xenith.re>"
-repository = "<https://github.com/xenith-re/xenith/>"
-
-keywords = ["virtualization", "detection"]
-license = "GPL-3.0"
-
-authors = ["abel <67806187+theo-abel@users.noreply.github.com>"]
+# Inherit workspace settings
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+version.workspace = true
+authors.workspace = true
+documentation.workspace = true
 
 [dependencies]
 xenith-redpill-macros = { path = "xenith-redpill-macros" }
 
+log = { workspace = true }
+thiserror = { workspace = true }
+
 colog = "1.3.0"
-log = "0.4.25"
-thiserror = "2.0.11"
 once_cell = "1.20.3"
 static_init = "1.0.3"
 raw-cpuid = "11.3.0"

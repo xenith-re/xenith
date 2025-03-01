@@ -2,21 +2,19 @@
 name = "xenith-vm"
 description = "Library for interacting with Xen. Allows to easily create and manage supported VMs."
 
-version = "0.1.0"
-edition = "2021"
+# Inherit workspace settings
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+version.workspace = true
+authors.workspace = true
+documentation.workspace = true
 
-homepage = "<https://xenith.re>"
-repository = "<https://github.com/xenith-re/xenith/>"
-
-keywords = ["virtualization", "detection"]
-license = "GPL-3.0"
-
-authors = ["abel <67806187+theo-abel@users.noreply.github.com>"]
-
-include = ["src/templates/"]
+include = ["templates/"]
 
 [dependencies]
-log = "0.4.26"
+log = { workspace = true }
+thiserror = { workspace = true }
+
 mac_address = "1.1.8"
 tera = { version = "1.20.0", default-features = false }
-thiserror = "2.0.11"
