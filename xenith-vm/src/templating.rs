@@ -18,8 +18,8 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 //! Xenith domain configuration templating
 
-use crate::domain::Domain;
 use crate::XlConfiguration;
+use crate::domain::Domain;
 
 use tera::{Context, Tera};
 

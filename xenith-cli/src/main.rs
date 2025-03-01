@@ -20,7 +20,7 @@ use clap::Parser;
 
 mod commands;
 
-use commands::{handle, Cli};
+use commands::{Cli, handle};
 
 fn main() {
     let args = Cli::parse();
