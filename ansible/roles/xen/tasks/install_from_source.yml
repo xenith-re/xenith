@@ -24,7 +24,7 @@
     - ninja-build
 
 - name: Configure Xen
-  ansible.builtin.command: ./configure --prefix=/usr --libdir=/usr/lib64 --enable-systemd
+  ansible.builtin.command: ./configure --prefix=/usr --libdir=/usr/local/lib64 --enable-systemd
   args:
     chdir: "{{ xen.source_path }}"
   become: false
@@ -42,7 +42,7 @@
   ansible.builtin.command: make dist -j{{ nproc.stdout }}
   args:
     chdir: "{{ xen.source_path }}"
-  become: false
+  become: true
   register: build_xen
   changed_when: false
   failed_when: build_xen.rc != 0
@@ -55,6 +55,15 @@
   register: install_xen
   changed_when: false
   failed_when: install_xen.rc != 0
+
+- name: Create /etc/ld.so.conf.d/xen.conf with the specified content
+  become: true
+  copy:
+    dest: /etc/ld.so.conf.d/xen.conf
+    content: "/usr/local/lib64"
+    mode: "0640"
+    owner: root
+    group: root
 
 - name: Rebuild dynamic linker cache
   ansible.builtin.command: /sbin/ldconfig
@@ -80,7 +89,10 @@
     name: "{{ item }}"
     enabled: true
   with_items:
+    # Required
     - xen-init-dom0.service
-    - xendomains.service
+    - xen-qemu-dom0-disk-backend.service
     - xenconsoled.service
+    # Optional
+    - xendomains.service
     - xenstored.service

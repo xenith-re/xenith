@@ -40,7 +40,7 @@ pub struct VmCreateArgs {
     test: Option<String>,
 }
 
-pub fn handle(args: VmArgs) -> () {
+pub fn handle(args: VmArgs) {
     match args.command {
         VmCommands::Create(create) => {
             log::info!("Creating VM with message: {:?}", create.test);
