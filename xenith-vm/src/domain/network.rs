@@ -149,7 +149,7 @@ impl Display for NetworkInterface {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "mac={}, bridge={}, gateway={}, type={}, model={}",
+            "mac={}, bridge={}, gatewaydev={}, type={}, model={}",
             self.mac,
             self.bridge,
             self.gateway_device,
@@ -211,7 +211,7 @@ mod tests {
         };
         assert_eq!(
             network_interface.to_string(),
-            "mac=00:16:3E:00:00:00, bridge=xenbr0, gateway=eth0, type=ioemu, model=rtl8139"
+            "mac=00:16:3E:00:00:00, bridge=xenbr0, gatewaydev=eth0, type=ioemu, model=rtl8139"
         );
     }
 
@@ -238,7 +238,7 @@ mod tests {
 
         assert_eq!(
             network_interfaces.xl_config(),
-            "vif = [ \"mac=00:16:3E:00:00:00, bridge=xenbr0, gateway=eth0, type=ioemu, model=rtl8139\", \"mac=00:16:3E:00:00:01, bridge=xenbr0, gateway=eth0, type=ioemu, model=rtl8139\" ]"
+            "vif = [ \"mac=00:16:3E:00:00:00, bridge=xenbr0, gatewaydev=eth0, type=ioemu, model=rtl8139\", \"mac=00:16:3E:00:00:01, bridge=xenbr0, gatewaydev=eth0, type=ioemu, model=rtl8139\" ]"
         );
     }
 }
