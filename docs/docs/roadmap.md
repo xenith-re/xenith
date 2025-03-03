@@ -29,14 +29,14 @@ This milestone builds the foundation for the project.
 
 {{% details title="Details" closed="true" %}}
 
-- [ ] Setup proper development environment
+- [x] Setup proper development environment
   - [x] Setup project structure
   - [x] Setup CI/CD pipeline
     - [x] Automated code testing (unit & integration, formatting, linting, code coverage)
     - [x] Automated documentation generation and deployment
   - [x] Add Xen upstream source tree as a submodule (wil allow us to easily update Xen)
   - [x] Add Depandabot to keep dependencies up to date
-  - [ ] Setup Github branch protections
+  - [x] Setup Github branch protections
   - [x] Setup Vagrantfile for development environment
     - [x] Add custom Vagrant command for connecting graphically to the dom0
     - [x] Automated provisioning of the Debian dom0 through Ansible
