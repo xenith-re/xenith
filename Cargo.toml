@@ -4,7 +4,16 @@
 
 [workspace]
 resolver = "2" # see https://doc.rust-lang.org/cargo/reference/resolver.html#resolver-versions
-members = [ "xenith-cli","xenith-redpill", "xenith-vm", "xenith-vmi"]
+members = [
+    "xenith-core",
+    "xenith-vm",
+    "xenith-vmi",
+    "xenith-cli",
+    "xenith-debugger",
+    "xenith-scripting",
+    "xenith-redpill",
+    "xenith-gui",
+]
 exclude = [ "xenith-website" ]
 
 [workspace.package]

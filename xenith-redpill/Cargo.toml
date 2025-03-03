@@ -7,8 +7,12 @@ edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 version.workspace = true
+publish.workspace = true
 authors.workspace = true
+homepage.workspace = true
 documentation.workspace = true
+repository.workspace = true
+keywords.workspace = true
 
 [dependencies]
 xenith-redpill-macros = { path = "xenith-redpill-macros" }
