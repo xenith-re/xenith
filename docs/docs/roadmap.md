@@ -43,14 +43,14 @@ This milestone builds the foundation for the project.
 - [x] Create a clean diataxis documentation
 - [ ] Create base crates (without any functionality) and workspace
   - [x] Project workspace
-  - [ ] `xenith-core` - Core functionality, shared between all other crates
+  - [x] `xenith-core` - Core functionality, shared between all other crates
   - [x] `xenith-cli` - Command line interface
   - [x] `xenith-vm` - Xen domain management
   - [x] `xenith-vmi` - [Virtual Machine Introspection](../reference/vmi) (VMI) wrappers
-  - [ ] `xenith-debugger` - [Debugger](../reference/debugger) interface
-  - [ ] `xenith-scripting` - Scripting interface
+  - [x] `xenith-debugger` - [Debugger](../reference/debugger) interface
+  - [x] `xenith-scripting` - Scripting interface
   - [x] `xenith-redpill` - Automated testing of virtual machines detection techniques ([redpills](../reference/redpill))
-  - [ ] `xenith-gui` - Graphical user interface
+  - [x] `xenith-gui` - Graphical user interface
 - [ ] Package Xenith tools for Debian dom0
 - [ ] Automated domU Linux and Windows image creation through Packer and Ansible
 
