@@ -41,7 +41,7 @@ This milestone builds the foundation for the project.
     - [x] Add custom Vagrant command for connecting graphically to the dom0
     - [x] Automated provisioning of the Debian dom0 through Ansible
 - [x] Create a clean diataxis documentation
-- [ ] Create base crates (without any functionality) and workspace
+- [x] Create base crates (without any functionality) and workspace
   - [x] Project workspace
   - [x] `xenith-core` - Core functionality, shared between all other crates
   - [x] `xenith-cli` - Command line interface
