@@ -34,7 +34,6 @@ This milestone builds the foundation for the project.
   - [ ] Setup CI/CD pipeline
     - [x] Automated code testing (unit & integration, formatting, linting, code coverage)
     - [x] Automated documentation generation and deployment
-    - [ ] Automated code testing in guest domains
   - [x] Add Xen upstream source tree as a submodule (wil allow us to easily update Xen)
   - [x] Add Depandabot to keep dependencies up to date
   - [ ] Setup Github branch protections
@@ -63,7 +62,30 @@ This milestone focuses on the domain management of Xenith, adding basic function
 
 {{% details title="Details" closed="true" %}}
 
-- [ ]
+First, we will wrap the `xl` command to manage domains, and in the future we will use the proper `libxl` bindings to enhance functionalities, but those are to be created (see [xenith-re/libxl-sys](https://github.com/xenith-re/libxl-sys/) for raw bindings and [xenith-re/libxl](https://github.com/xenith-re/libxl) for a safe wrapper).
+
+In `xenith-vm` crate:
+
+- [ ] Disk managing
+  - [ ] Create disk
+  - [ ] Delete disk
+  - [ ] Resize disk
+- [ ] Domain managing
+  - [ ] Create
+  - [ ] Delete
+  - [ ] Start
+  - [ ] Stop
+  - [ ] Pause
+  - [ ] Continue
+  - [ ] List domains
+  - [ ] Get domain information (state, memory, CPU, network, …)
+- [ ] Snapshot managing
+  - [ ] Create snapshot
+  - [ ] Delete snapshot
+  - [ ] Restore snapshot
+- [ ] Configuration managing (defaults to `/xenith` to manage everything)
+  - [ ] Get set configuration path
+  - [ ] Store domain configuration, image, snapshots, disks, …
 
 {{% /details %}}
 
@@ -73,20 +95,12 @@ This milestone focuses on the command-line interface (CLI), providing a powerful
 
 {{% details title="Details" closed="true" %}}
 
-<!--
-vm (using libxl bindings), maybe first wrap xl command and setup future task to use proper libxl bindings and enhance functionalities
-  - snapshot/restore
-  - start/stop
-  - pause/continue
-  - …
-disk
-debug ?
-ssh (connect through ssh if image contains it)
-winrm (connect through winrm if image contains it)
-vnc/sdl or anything related to get a graphical connection in domU
--->
-
-- [ ]
+- [ ] Expose all `xenith-vm` functionalities
+- [ ] Provide multiple ways to connect to domU
+  - [ ] SSH
+  - [ ] WinRM
+  - [ ] VNC
+  - [ ] SDL
 
 {{% /details %}}
 
@@ -116,7 +130,24 @@ This milestone focuses on the [debugger](../reference/debugger) [VMI](../referen
 
 {{% /details %}}
 
-### v0.6.0 - Scripting
+### v0.6.0 - Stealth
+
+<div class="hx-mt-2"></div>
+{{< badge content="To be planned" type="warning" icon="exclamation" >}}
+
+This milestone focuses on making Xenith stealthy and hard to detect, allowing users to perform their research and development without being detected by the target system. This will include creating [redpills](../reference/redpill) to detect virtual machines and implementing countermeasures to avoid detection.
+
+{{% details title="Details" closed="true" %}}
+
+- [ ] Modify `cpuid` to edit common requested values
+- [ ] Hook MSR reads and writes
+- [ ] Hook `rdtsc` instruction
+- [ ] Automated code testing in guest domains (for redpills)
+- [ ] Others to be defined
+
+{{% /details %}}
+
+### v0.7.0 - Scripting
 
 <div class="hx-mt-2"></div>
 {{< badge content="To be planned" type="warning" icon="exclamation" >}}
@@ -129,7 +160,7 @@ This milestone provides a scripting interface, allowing users to automate tasks 
 
 {{% /details %}}
 
-### v0.7.0 - Plugin system
+### v0.8.0 - Plugin system
 
 <div class="hx-mt-2"></div>
 {{< badge content="To be planned" type="warning" icon="exclamation" >}}
@@ -142,7 +173,7 @@ This milestone focuses on the extensibility of Xenith, allowing users to easily 
 
 {{% /details %}}
 
-### v0.8.0 - Automated tasks and workflows
+### v0.9.0 - Automated tasks and workflows
 
 <div class="hx-mt-2"></div>
 {{< badge content="To be planned" type="warning" icon="exclamation" >}}
@@ -157,7 +188,7 @@ This will notably include creating plugins for common tasks and workflows, speci
 
 {{% /details %}}
 
-### v0.9.0 - Graphical User Interface
+### v0.10.0 - Graphical User Interface
 
 <div class="hx-mt-2"></div>
 {{< badge content="To be planned" type="warning" icon="exclamation" >}}
