@@ -31,7 +31,7 @@ This milestone builds the foundation for the project.
 
 - [ ] Setup proper development environment
   - [x] Setup project structure
-  - [ ] Setup CI/CD pipeline
+  - [x] Setup CI/CD pipeline
     - [x] Automated code testing (unit & integration, formatting, linting, code coverage)
     - [x] Automated documentation generation and deployment
   - [x] Add Xen upstream source tree as a submodule (wil allow us to easily update Xen)
