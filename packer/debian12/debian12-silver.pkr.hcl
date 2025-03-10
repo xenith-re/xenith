@@ -120,11 +120,6 @@ variable "builder_memory" {
 }
 
 # Provisioning settings
-variable "start_retry_timeout" {
-  type    = string
-  default = "5m"
-}
-
 variable "mirror" {
   type    = string
   default = "ftp.fr.debian.org"
@@ -139,9 +134,9 @@ variable "preseed_file" {
 # Sources
 ####################
 
-source "qemu" "debian" {
+source "qemu" "debian12-silver" {
   # VM settings
-  vm_name = "packer-debian"
+  vm_name = "debian12-silver.qcow2"
   # maybe add custom cpu and memory settings for builder
 
   # Qemu options
@@ -161,7 +156,7 @@ source "qemu" "debian" {
   disk_cache     = "writeback"
 
   # Directories
-  output_directory = "output"
+  output_directory = "build/silver"
   http_content     = { "/${var.preseed_file}" = templatefile(var.preseed_file, { var = var }) }
 
   # SSH settings
@@ -176,7 +171,7 @@ source "qemu" "debian" {
   # Boot settings
   boot_wait = "10s"
   boot_command = [
-    "<wait><wait><wait><esc><wait><wait><wait>",
+    "<esc><wait><wait><wait>",
     "/install.amd/vmlinuz ",
     "initrd=/install.amd/initrd.gz ",
     "auto=true ",
@@ -194,15 +189,6 @@ source "qemu" "debian" {
 ####################
 
 build {
-  sources = ["source.qemu.debian"]
-
-  provisioner "shell" {
-    binary              = false
-    execute_command     = "echo '${var.password}' | {{ .Vars }} sudo -E -S '{{ .Path }}'"
-    expect_disconnect   = true
-    inline              = ["echo '${var.username} ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/99${var.username}", "chmod 0440 /etc/sudoers.d/99${var.username}"]
-    inline_shebang      = "/bin/sh -e"
-    skip_clean          = false
-    start_retry_timeout = var.start_retry_timeout
-  }
+  name    = "debian12-silver"
+  sources = ["source.qemu.debian12-silver"]
 }
