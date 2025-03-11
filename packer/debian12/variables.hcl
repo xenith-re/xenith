@@ -39,6 +39,7 @@ system_clock_in_utc = "true"
 
 # QEMU settings
 builder_memory = 4096
+builder_cores = 8
 
 # Provisioner settings
 start_retry_timeout = "5m"

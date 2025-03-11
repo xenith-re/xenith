@@ -78,7 +78,7 @@ source "qemu" "debian12-golden" {
   accelerator = "kvm" # to be changed by "xen"
   headless    = "true"
   memory      = var.builder_memory
-  cores       = 8
+  cores       = var.builder_cores
 
   # Image settings
   iso_url      = "build/silver/debian12-silver.qcow2"
