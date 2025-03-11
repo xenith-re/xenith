@@ -137,13 +137,12 @@ variable "preseed_file" {
 source "qemu" "debian12-silver" {
   # VM settings
   vm_name = "debian12-silver.qcow2"
-  # maybe add custom cpu and memory settings for builder
 
   # Qemu options
   accelerator = "kvm" # to be changed by "xen"
-  # headless    = "true"
-  memory = var.builder_memory
-  cores  = 8
+  headless    = "true"
+  memory      = var.builder_memory
+  cores       = 8
 
   # ISO settings
   iso_url      = var.iso_url

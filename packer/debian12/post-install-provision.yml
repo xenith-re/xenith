@@ -11,16 +11,6 @@
         create: true
         mode: "0440"
 
-    - name: Print all network interfaces
-      ansible.builtin.command: ip a
-      register: network_interfaces
-      changed_when: network_interfaces.rc == 0
-      failed_when: network_interfaces.rc != 0
-
-    - name: Print all network interfaces
-      ansible.builtin.debug:
-        var: network_interfaces.stdout_lines
-
     # These entries prevents the installation of additional packages
     - name: Remove CD-ROM entries
       ansible.builtin.lineinfile:

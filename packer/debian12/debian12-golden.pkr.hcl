@@ -73,17 +73,12 @@ variable "builder_memory" {
 source "qemu" "debian12-golden" {
   # VM settings
   vm_name = "debian12-golden.qcow2"
-  # maybe add custom cpu and memory settings for builder
 
   # Qemu options
   accelerator = "kvm" # to be changed by "xen"
-  # headless    = "true"
-  memory = var.builder_memory
-  cores  = 8
-  # qemuargs = [
-  #   ["-netdev", "user,id=net0"],
-  #   ["-device", "virtio-net-pci,netdev=net0"],
-  # ]
+  headless    = "true"
+  memory      = var.builder_memory
+  cores       = 8
 
   # Image settings
   iso_url      = "build/silver/debian12-silver.qcow2"
