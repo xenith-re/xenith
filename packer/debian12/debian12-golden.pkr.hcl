@@ -80,6 +80,10 @@ source "qemu" "debian12-golden" {
   # headless    = "true"
   memory = var.builder_memory
   cores  = 8
+  # qemuargs = [
+  #   ["-netdev", "user,id=net0"],
+  #   ["-device", "virtio-net-pci,netdev=net0"],
+  # ]
 
   # Image settings
   iso_url      = "build/silver/debian12-silver.qcow2"

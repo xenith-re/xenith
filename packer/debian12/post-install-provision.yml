@@ -2,24 +2,39 @@
 - name: Provision Debian 12
   hosts: all
   gather_facts: false
+  become: true
   tasks:
     - name: Add user to sudoers
-      become: true
       ansible.builtin.lineinfile:
         path: /etc/sudoers.d/99{{ username }}
         line: "{{ username }} ALL=(ALL) NOPASSWD: ALL"
         create: true
         mode: "0440"
 
+    - name: Print all network interfaces
+      ansible.builtin.command: ip a
+      register: network_interfaces
+      changed_when: network_interfaces.rc == 0
+      failed_when: network_interfaces.rc != 0
+
+    - name: Print all network interfaces
+      ansible.builtin.debug:
+        var: network_interfaces.stdout_lines
+
+    # These entries prevents the installation of additional packages
+    - name: Remove CD-ROM entries
+      ansible.builtin.lineinfile:
+        path: /etc/apt/sources.list
+        state: absent
+        regexp: '^deb cdrom'
+
     - name: Perform system upgrade
-      become: true
       ansible.builtin.package:
         name: "*"
         force_apt_get: true
         update_cache: true
 
     - name: Install useful tools
-      become: true
       ansible.builtin.package:
         name: "{{ item }}"
       with_items:

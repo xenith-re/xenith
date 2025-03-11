@@ -35,6 +35,38 @@ build-golden:
 		echo "Error: $(NAME)-golden.pkr.hcl or variables.hcl not found in $(NAME) directory."; \
 	fi
 
+# Run the specified Packer iso with QEMU
+.PHONY: run-silver
+run-silver:
+	@echo "Running iso: $(NAME)-silver"
+	@if [ -f $(NAME)/build/silver/$(NAME)-silver.qcow2 ]; then \
+		qemu-system-x86_64 \
+			-drive file=$(NAME)/build/silver/$(NAME)-silver.qcow2,format=qcow2 \
+			-m 4G \
+			-netdev user,id=net0 \
+			-device virtio-net-pci,netdev=net0 \
+			-smp sockets=1,cores=4,threads=4; \
+	else \
+		echo "Error: $(NAME)-silver.qcow2 not found in $(NAME)/build/silver directory."; \
+	fi
+
+# Run the specified Packer image with QEMU
+.PHONY: run-golden
+run-golden:
+	@echo "Running image: $(NAME)-golden"
+	@if [ -f $(NAME)/build/golden/$(NAME)-golden.qcow2 ]; then \
+		qemu-system-x86_64 \
+			-drive file=$(NAME)/build/golden/$(NAME)-golden.qcow2,format=qcow2 \
+			-enable-kvm \
+			-m 4G \
+			-netdev user,id=net0 \
+			-device virtio-net-pci,netdev=net0 \
+			-smp sockets=1,cores=4,threads=4; \
+	else \
+		echo "Error: $(NAME)-golden.qcow2 not found in $(NAME)/build/golden directory."; \
+	fi
+
+
 # Clean up the output directories for all images
 .PHONY: clean
 clean:
