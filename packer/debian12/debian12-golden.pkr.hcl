@@ -66,6 +66,12 @@ variable "builder_memory" {
   description = "Memory allocated to the builder"
 }
 
+variable "builder_cores" {
+  type        = number
+  default     = 8
+  description = "CPU cores allocated to the builder"
+}
+
 ####################
 # Sources
 ####################
@@ -117,8 +123,9 @@ build {
   sources = ["source.qemu.debian12-golden"]
 
   provisioner "ansible" {
-    playbook_file = "post-install-provision.yml"
-    user          = var.username
+    playbook_file    = "post-install-provision.yml"
+    user             = var.username
+    ansible_env_vars = ["ANSIBLE_ROLES_PATH=../../ansible/roles"]
     extra_arguments = [
       # "-vvvv", # useful for debugging
       "--extra-vars",

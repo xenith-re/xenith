@@ -119,6 +119,12 @@ variable "builder_memory" {
   description = "Memory allocated to the builder"
 }
 
+variable "builder_cores" {
+  type        = number
+  default     = 8
+  description = "CPU cores allocated to the builder"
+}
+
 # Provisioning settings
 variable "mirror" {
   type    = string
