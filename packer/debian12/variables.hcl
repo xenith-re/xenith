@@ -42,4 +42,4 @@ builder_memory = 4096
 builder_cores = 8
 
 # Provisioner settings
-start_retry_timeout = "5m"
+ansible_roles_path = "../../ansible/roles"

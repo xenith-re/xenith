@@ -3,14 +3,7 @@
   hosts: all
   gather_facts: false
   become: true
-  tasks:
-    - name: Add user to sudoers
-      ansible.builtin.lineinfile:
-        path: /etc/sudoers.d/99{{ username }}
-        line: "{{ username }} ALL=(ALL) NOPASSWD: ALL"
-        create: true
-        mode: "0440"
-
+  pre_tasks:
     # These entries prevents the installation of additional packages
     - name: Remove CD-ROM entries
       ansible.builtin.lineinfile:
@@ -18,20 +11,5 @@
         state: absent
         regexp: '^deb cdrom'
 
-    - name: Perform system upgrade
-      ansible.builtin.package:
-        name: "*"
-        force_apt_get: true
-        update_cache: true
-
-    - name: Install useful tools
-      ansible.builtin.package:
-        name: "{{ item }}"
-      with_items:
-        - git
-        - btop
-        - vim
-        - wget
-        - build-essential
-        - python3
-        - python3-dev
+  roles:
+    - common

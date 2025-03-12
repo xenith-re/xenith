@@ -72,6 +72,13 @@ variable "builder_cores" {
   description = "CPU cores allocated to the builder"
 }
 
+# Provisioner settings
+variable "ansible_roles_path" {
+  type        = string
+  default     = "../../ansible/roles"
+  description = "Path to the Ansible roles"
+}
+
 ####################
 # Sources
 ####################
@@ -125,7 +132,7 @@ build {
   provisioner "ansible" {
     playbook_file    = "post-install-provision.yml"
     user             = var.username
-    ansible_env_vars = ["ANSIBLE_ROLES_PATH=../../ansible/roles"]
+    ansible_env_vars = ["ANSIBLE_ROLES_PATH=${var.ansible_roles_path}"]
     extra_arguments = [
       # "-vvvv", # useful for debugging
       "--extra-vars",
