@@ -13,9 +13,9 @@ jobs:
        if: github.event.pull_request.base.ref == 'main'
        run: |
           REF="${{ github.event.pull_request.head.ref }}"
-          if [[ "$REF" ~= ^(qa|dev|staging|hotfix)$ ]]; then
-            echo "Merge branch is allowed: $REF"
+          if [[ "$REF" =~ ^(qa|dev|staging|hotfix) ]]; then
+              echo "Merge branch is allowed: $REF"
           else
-            echo "Merges to release/QA are only allowed from the dev branch."
-            exit 1
+              echo "Merges to release/QA are only allowed from qa/dev/staging/hotfix branches"
+              exit 1
           fi
