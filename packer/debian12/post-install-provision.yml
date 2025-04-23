@@ -1,0 +1,15 @@
+---
+- name: Provision Debian 12
+  hosts: all
+  gather_facts: false
+  become: true
+  pre_tasks:
+    # These entries prevents the installation of additional packages
+    - name: Remove CD-ROM entries
+      ansible.builtin.lineinfile:
+        path: /etc/apt/sources.list
+        state: absent
+        regexp: '^deb cdrom'
+
+  roles:
+    - common

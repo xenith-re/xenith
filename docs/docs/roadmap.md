@@ -52,7 +52,9 @@ This milestone builds the foundation for the project.
   - [x] `xenith-redpill` - Automated testing of virtual machines detection techniques ([redpills](../reference/redpill))
   - [x] `xenith-gui` - Graphical user interface
 - [ ] Package Xenith tools for Debian dom0
-- [ ] Automated domU Linux and Windows image creation through Packer and Ansible
+- [ ] Automated domU image creation through Packer and Ansible
+  - [ ] Automated provisioning of the Debian 12 domU through Ansible
+  - [ ] Automated provisioning of the Windows 11 domU through Ansible
 
 {{% /details %}}
 

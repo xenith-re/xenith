@@ -3,6 +3,6 @@
   become: true
   gather_facts: false
   roles:
-    - xen
     - common
+    - xen
     - kde
