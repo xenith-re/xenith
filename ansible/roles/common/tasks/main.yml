@@ -1,5 +1,4 @@
 ---
-
 - name: Perform system upgrade
   ansible.builtin.package:
     name: "*"

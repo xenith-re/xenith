@@ -1,3 +1,4 @@
+---
 tools:
   enable_sshd: true
   enable_partitioning: true

@@ -1,3 +1,4 @@
+---
 - name: Post-reboot tasks
   hosts: all
   become: true
