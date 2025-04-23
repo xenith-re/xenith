@@ -12,7 +12,10 @@ jobs:
      - name: Check merge branch
        if: github.event.pull_request.base.ref == 'main'
        run: |
-         if [ "${{ github.event.pull_request.head.ref }}" != "dev" ]; then
-           echo "Merges to release/QA are only allowed from the dev branch."
-           exit 1
-         fi
+          REF="${{ github.event.pull_request.head.ref }}"
+          if [[ "$REF" ~= ^(qa|dev|staging|hotfix)$ ]]; then
+            echo "Merge branch is allowed: $REF"
+          else
+            echo "Merges to release/QA are only allowed from the dev branch."
+            exit 1
+          fi
