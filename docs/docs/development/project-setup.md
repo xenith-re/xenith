@@ -336,9 +336,6 @@ Make sure to follow the instructions on the screen to add Rust to your `PATH`. Y
     ```
 
     {{< /tab >}}
-    ```
-
-    {{< /tab >}}
 
 {{< /tabs >}}
 
