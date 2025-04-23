@@ -51,9 +51,8 @@ This milestone builds the foundation for the project.
   - [x] `xenith-scripting` - Scripting interface
   - [x] `xenith-redpill` - Automated testing of virtual machines detection techniques ([redpills](../reference/redpill))
   - [x] `xenith-gui` - Graphical user interface
-- [ ] Package Xenith tools for Debian dom0
-- [ ] Automated domU image creation through Packer and Ansible
-  - [ ] Automated provisioning of the Debian 12 domU through Ansible
+- [x] Automated domU image creation through Packer and Ansible
+  - [x] Automated provisioning of the Debian 12 domU through Ansible
   - [ ] Automated provisioning of the Windows 11 domU through Ansible
 
 {{% /details %}}
@@ -103,6 +102,7 @@ This milestone focuses on the command-line interface (CLI), providing a powerful
   - [ ] WinRM
   - [ ] VNC
   - [ ] SDL
+- [ ] Package Xenith tools for Debian dom0
 
 {{% /details %}}
 
