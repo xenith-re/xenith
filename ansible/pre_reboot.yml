@@ -1,8 +1,9 @@
+---
 - name: Pre-reboot tasks
   hosts: all
   become: true
   gather_facts: false
   roles:
-    - xen
     - common
+    - xen
     - kde

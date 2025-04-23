@@ -1,8 +1,7 @@
 [package]
-name = "xenith-vmi"
-description = "Library for interacting with Xen domU through Virtual Machine Introspection (VMI)."
+name = "xenith-core"
+description = "Provides core functionality for Xenith tools (shared configuration, invariants, utilities, ...)."
 
-# Inherit workspace settings
 edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
@@ -13,3 +12,5 @@ homepage.workspace = true
 documentation.workspace = true
 repository.workspace = true
 keywords.workspace = true
+
+[dependencies]

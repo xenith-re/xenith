@@ -1,3 +1,4 @@
+---
 - name: Install sshd
   ansible.builtin.include_tasks: sshd.yml
   when: tools.enable_sshd

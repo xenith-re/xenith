@@ -4,6 +4,7 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+    target-branch: "dev"
     groups:
       actions-updates:
         dependency-type: "production"
@@ -15,6 +16,7 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+    target-branch: "dev"
     groups:
       dep-updates:
         dependency-type: "production"

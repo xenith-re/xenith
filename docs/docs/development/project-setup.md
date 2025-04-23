@@ -288,3 +288,83 @@ virt-manager --connect qemu:///system --show-domain-console xenith_xenith
 ```
 
 {{% /steps %}}
+
+## Rust
+
+Rust is the programming language used to develop Xenith. You can install Rust on your system using the following commands:
+
+{{< tabs items="Arch Linux,Ubuntu" >}}
+
+    {{< tab >}}
+
+    ```shell
+    sudo pacman -S rustup
+    ```
+
+    or
+
+    ```shell
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+    ```
+
+    {{< /tab >}}
+
+    {{< tab >}}
+
+    ```shell
+    curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+    ```
+
+    {{< /tab >}}
+
+{{< /tabs >}}
+
+Make sure to follow the instructions on the screen to add Rust to your `PATH`. You can do this by running the following command:
+
+{{< tabs items="Bash/Zsh,Fish" >}}
+
+    {{< tab >}}
+
+    Check this [stack overflow post](https://unix.stackexchange.com/a/26059) for more information.
+
+    {{< /tab >}}
+
+    {{< tab >}}
+
+    ```shell
+    fish_add_path $HOME/.cargo/bin
+    ```
+
+    {{< /tab >}}
+    ```
+
+    {{< /tab >}}
+
+{{< /tabs >}}
+
+## Just
+
+> [!Note]
+> Just is a command runner with a Makefile-like syntax. It is used to automate tasks and run commands in a consistent manner. It is similar to Make, but with a simpler syntax and more features.
+
+This is optional but recommended. Just is used to run commands in the project. You can install Just on your system using the following commands:
+
+{{< tabs items="Arch Linux,Ubuntu" >}}
+
+    {{< tab >}}
+
+    ```shell
+    sudo pacman -S just
+    ```
+
+    {{< /tab >}}
+
+    {{< tab >}}
+
+    ```shell
+    sudo apt install just -y
+    ```
+
+    {{< /tab >}}
+
+{{< /tabs >}}
