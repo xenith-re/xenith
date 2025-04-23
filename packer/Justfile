@@ -1,0 +1,99 @@
+# Packer domain image building Justfile
+
+import "../Justfile"
+
+# ------------------------------
+# Requirements
+# ------------------------------
+packer := require("packer")
+qemu := require("qemu-system-x86_64")
+
+# ------------------------------
+# Variables
+# ------------------------------
+IMAGES := shell("/usr/bin/find " + PACKER_DIR + " -maxdepth 1 -type d -not -path '" + PACKER_DIR + "'")
+
+# ------------------------------
+# Tasks
+# ------------------------------
+[doc("Default task - will be run when no task is specified.")]
+default:
+    @just --list
+
+[private]
+[group("build")]
+[doc("Build the specified Packer template.")]
+build-template IMAGE TEMPLATE:
+    #!/usr/bin/env bash
+    IMAGE_PATH="{{ PACKER_DIR }}/{{ IMAGE }}"
+
+    echo "Building {{ TEMPLATE }}: {{ IMAGE }}-{{ TEMPLATE }}"
+    if [ -f {{ IMAGE }}/{{ IMAGE }}-{{ TEMPLATE }}.pkr.hcl ] && [ -f {{ IMAGE }}/variables.hcl ]; then
+        cd {{ IMAGE }} && {{ packer }} build -var-file=variables.hcl {{ IMAGE }}-{{ TEMPLATE }}.pkr.hcl
+    else
+        echo "Error: {{ IMAGE }}-{{ TEMPLATE }}.pkr.hcl or variables.hcl not found in {{ IMAGE }} directory."
+    fi
+
+[private]
+[group("run")]
+[doc("Run the specified Packer image template.")]
+run-template IMAGE TEMPLATE:
+    #!/usr/bin/env bash
+    DISK="{{ IMAGE }}/build/{{ TEMPLATE }}/{{ IMAGE }}-{{ TEMPLATE }}.qcow2"
+
+    echo "Running {{ IMAGE }}-{{ TEMPLATE }}"
+    if [ -f $DISK ]; then
+        {{ qemu }} \
+            -drive file=$DISK,format=qcow2 \
+            -enable-kvm \
+            -m 4G \
+            -netdev user,id=net0 \
+            -device virtio-net-pci,netdev=net0 \
+            -smp sockets=1,cores=4,threads=4
+    else
+        echo "Error: {{ IMAGE }}-{{ TEMPLATE }}.qcow2 not found in {{ IMAGE }}/build/{{ TEMPLATE }} directory."
+    fi
+
+[doc("List all Packer images.")]
+list-images:
+    #!/usr/bin/env bash
+
+    images="{{ IMAGES }}"
+    for image in ${images}; do
+        echo "$image"
+    done
+
+[group("build")]
+[doc("Build the specified Packer image.")]
+build-image IMAGE:
+    just build-silver {{ IMAGE }}
+    just build-golden {{ IMAGE }}
+
+[group("build")]
+[doc("Build the specified Packer iso.")]
+build-silver IMAGE:
+    just build-template {{ IMAGE }} silver
+
+[group("build")]
+[doc("Build the specified Packer qcow2 image.")]
+build-golden IMAGE:
+    just build-template {{ IMAGE }} golden
+
+[group("run")]
+[doc("Run the specified Packer image.")]
+run-silver IMAGE:
+    just run-template {{ IMAGE }} silver
+
+[group("run")]
+[doc("Run the specified Packer qcow2 image.")]
+run-golden IMAGE:
+    just run-template {{ IMAGE }} golden
+
+[doc("Clean up the output directories for all images."), confirm("Are you sure you want to clean up the output directories? (y/n)")]
+clean:
+    #!/usr/bin/env bash
+
+    images="{{ IMAGES }}"
+    for image in ${images}; do
+        rm -rf ${image}/build
+    done

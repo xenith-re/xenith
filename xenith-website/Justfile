@@ -1,0 +1,42 @@
+# Packer domain image building Justfile
+
+import "../Justfile"
+
+# ------------------------------
+# Requirements
+# ------------------------------
+hugo := require("hugo")
+go := require("go")
+
+# ------------------------------
+# Tasks
+# ------------------------------
+[doc("Default task - will be run when no task is specified.")]
+default:
+    @just --list
+
+[doc("Updates the website theme to the latest version.")]
+update-theme:
+    @echo "Updating theme..."
+    @{{ hugo }} mod get -u
+    @{{ hugo }} mod tidy
+    @echo "Theme update complete."
+
+[doc("Builds the website.")]
+build:
+    {{ hugo }} --buildDrafts
+    @echo "Build complete. Check the public directory."
+
+[doc("Runs the website in development mode.")]
+serve:
+    {{ hugo }} server \
+        --buildDrafts \
+        --renderToMemory \
+        --disableFastRender \
+        --source {{ WEBSITE_DIR }} \
+        --logLevel debug
+
+[doc("Opens the website in the default browser.")]
+open:
+    @echo "Opening website in browser..."
+    @xdg-open http://localhost:1313

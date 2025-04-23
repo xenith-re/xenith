@@ -1,0 +1,18 @@
+# Ansible Justfile
+
+import "../Justfile"
+
+# ------------------------------
+# Requirements
+# ------------------------------
+ansible-lint := require("ansible-lint")
+
+# ------------------------------
+# Tasks
+# ------------------------------
+[doc("Default task - will be run when no task is specified.")]
+default:
+    @just --list
+
+lint *ARGS:
+    @{{ ansible-lint }} --profile production --project-dir {{ ANSIBLE_DIR }} --fix {{ ARGS }}
