@@ -26,6 +26,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// See `man 7 xen-tscmode` for more information.
 #[derive(Debug, Clone, Default, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
 pub enum TimeStampCounterMode {
     /// Guest rdtsc/p is executed natively when monotonicity can be guaranteed and
     /// emulated otherwise (with frequency scaled if necessary).

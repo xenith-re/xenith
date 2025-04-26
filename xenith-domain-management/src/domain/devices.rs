@@ -25,6 +25,7 @@ use serde::{Deserialize, Serialize};
 
 /// List of supported disk formats
 #[derive(Debug, Clone, Default, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
 pub enum DiskFormat {
     /// This is a simple, unstructured format that provides direct access to the disk image.
     /// It is straightforward and offers good performance but lacks advanced features like snapshots.
@@ -86,10 +87,10 @@ impl Display for DiskAccess {
 /// See `man xl-disk-configuration` for more information.
 #[derive(Debug, Clone, Default, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize)]
 pub struct Disk {
-    /// Block device or image file path.  When this is used as a path, /dev will be
+    /// Block device or image file path. When this is used as a path, /dev will be
     /// prepended if the path doesn't start with a '/'.
     pub target: PathBuf,
-    /// Size of the disk in bytes.  This is required for file-based disk images.
+    /// Size of the disk in bytes. This is required for file-based disk images.
     pub size: u64,
     /// Specifies the format of image file. See [`DiskFormat`] for more information.
     pub format: DiskFormat,
@@ -98,8 +99,14 @@ pub struct Disk {
     /// attribute.
     pub access: DiskAccess,
     /// Virtual device as seen by the guest (also referred to as guest drive
-    /// designation in some specifications).  See xen-vbd-interface(7).
+    /// designation in some specifications). See xen-vbd-interface(7).
     pub virtual_device: String,
+}
+
+impl Disk {
+    pub fn is_read_only(&self) -> bool {
+        self.access == DiskAccess::ReadOnly
+    }
 }
 
 impl Display for Disk {
@@ -127,19 +134,23 @@ pub struct DiskDevices(pub Vec<Disk>);
 ///
 /// The boot device is used to specify the device from which the virtual machine should boot.
 #[derive(Debug, Clone, Default, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
 pub enum BootDevice {
     #[default]
+    #[serde(rename = "hd")]
     HardDisk,
+    #[serde(rename = "cdrom")]
     CdRom,
+    #[serde(rename = "network")]
     Network,
 }
 
 impl Display for BootDevice {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            BootDevice::HardDisk => write!(f, "c"),
-            BootDevice::CdRom => write!(f, "d"),
-            BootDevice::Network => write!(f, "n"),
+            BootDevice::HardDisk => write!(f, "hd"),
+            BootDevice::CdRom => write!(f, "cdrom"),
+            BootDevice::Network => write!(f, "network"),
         }
     }
 }
@@ -150,6 +161,7 @@ pub struct BootDevices(pub Vec<BootDevice>);
 
 /// Represents the type of emulated disk controller to use
 #[derive(Debug, Clone, Default, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
 pub enum EmulatedDiskControllerType {
     /// Adds an emulated IDE controller, which is
     /// suitable even for older operation systems.
@@ -207,9 +219,9 @@ mod tests {
 
     #[test]
     fn test_boot_device_display() {
-        assert_eq!(format!("{}", BootDevice::HardDisk), "c");
-        assert_eq!(format!("{}", BootDevice::CdRom), "d");
-        assert_eq!(format!("{}", BootDevice::Network), "n");
+        assert_eq!(format!("{}", BootDevice::HardDisk), "hd");
+        assert_eq!(format!("{}", BootDevice::CdRom), "cdrom");
+        assert_eq!(format!("{}", BootDevice::Network), "network");
     }
 
     #[test]

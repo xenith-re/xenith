@@ -53,8 +53,12 @@ impl DomainTemplate {
         let mut tera = Tera::default();
         tera.add_template_file(template, name)?;
 
-        let mut context = Context::new();
+        // Disable autoescaping for all templates
+        // This is necessary for XML templates to prevent escaping of special characters
+        // such as <, >, & and /.
+        tera.autoescape_on(vec![]);
 
+        let mut context = Context::new();
         context.insert("domain", &domain);
 
         Ok(Self { tera, context })
@@ -70,11 +74,7 @@ impl DomainTemplate {
     ///
     /// A [`Result`] containing the [`DomainTemplate`] if successful, or a [`tera::Error`] if not
     pub fn new(domain: Domain) -> Result<Self, tera::Error> {
-        DomainTemplate::new_with_template(
-            domain,
-            DomainTemplate::DEFAULT_CONFIG_TEMPLATE,
-            Some("default"),
-        )
+        DomainTemplate::new_with_template(domain, DomainTemplate::DEFAULT_CONFIG_TEMPLATE, None)
     }
 
     /// Render the domain configuration template
@@ -95,6 +95,27 @@ mod tests {
 
     use super::*;
     use crate::domain::*;
+
+    #[test]
+    fn test_default_template() {
+        let template_path = PathBuf::from(DomainTemplate::DEFAULT_CONFIG_TEMPLATE);
+        assert!(template_path.exists(), "Template file does not exist");
+        assert!(template_path.is_file(), "Template path is not a file");
+        assert!(
+            template_path
+                .extension()
+                .map(|ext| ext == "xml")
+                .unwrap_or(false),
+            "Template file is not an XML file"
+        );
+        assert!(
+            template_path
+                .file_name()
+                .map(|name| name == "default.xml")
+                .unwrap_or(false),
+            "Template file is not named default.xml"
+        );
+    }
 
     #[test]
     fn test_domain_template() -> Result<(), tera::Error> {
@@ -194,6 +215,7 @@ mod tests {
         // Create a new domain template and render it
         let template = DomainTemplate::new(domain)?;
         let rendered = template.render()?;
+        println!("{}", rendered);
 
         // Read test fixture and compare line by line, this allows easier debugging
         let expected = std::fs::read_to_string("tests/fixtures/default.xml")?;

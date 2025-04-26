@@ -46,6 +46,7 @@ use serde::{Deserialize, Serialize};
 /// ⚠️ Even though PV and PVH are supported by Xen and listed here, they are not supported by Xenith.
 /// Those are kept here for future compatibility.
 #[derive(Debug, Clone, Default, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
 pub enum DomainType {
     /// Hardware Virtual Machine : This is a full virtualization technique that allows the guest
     /// operating system to run on the virtual machine without any modifications. It provides better
@@ -79,6 +80,7 @@ impl Display for DomainType {
 /// Represents the type of VGA console to use for the guest
 /// The VGA console is used to display the guest operating system's graphical output.
 #[derive(Debug, Clone, Default, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
 pub enum GuestConsole {
     /// Simple DirectMedia Layer (SDL) : This is a cross-platform multimedia library that provides
     /// low-level access to audio, keyboard, mouse, and display hardware. It is used to create

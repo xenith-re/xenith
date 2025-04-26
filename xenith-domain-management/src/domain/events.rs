@@ -24,6 +24,7 @@ use serde::{Deserialize, Serialize};
 
 /// Represents the action to take when a domain event occurs
 #[derive(Debug, Clone, Default, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
 pub enum EventAction {
     /// Destroy the domain
     #[default]
