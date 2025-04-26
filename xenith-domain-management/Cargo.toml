@@ -21,8 +21,8 @@ name = "xenith-vm"
 path = "src/main.rs"
 
 [dependencies]
-# log = { workspace = true }
-# thiserror = { workspace = true }
+log = { workspace = true }
+thiserror = { workspace = true }
 virt = "0.4.2"
 macaddr = { version = "1.0.1", features = ["serde_std"] }
 tera = { version = "1.20.0", default-features = false }

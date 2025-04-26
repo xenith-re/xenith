@@ -90,8 +90,6 @@ pub struct Disk {
     /// Block device or image file path. When this is used as a path, /dev will be
     /// prepended if the path doesn't start with a '/'.
     pub target: PathBuf,
-    /// Size of the disk in bytes. This is required for file-based disk images.
-    pub size: u64,
     /// Specifies the format of image file. See [`DiskFormat`] for more information.
     pub format: DiskFormat,
     /// Specified access control information. Whether or not the block device is
@@ -206,7 +204,6 @@ mod tests {
     fn test_disk_display() {
         let disk = Disk {
             target: PathBuf::from("/dev/sda"),
-            size: 1024,
             format: DiskFormat::Qcow2,
             access: DiskAccess::ReadWrite,
             virtual_device: "xvda".to_string(),

@@ -16,17 +16,28 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-use thiserror::Error;
-use virt::error::Error as LibvirtError;
+use virt::connect::Connect;
+use virt::domain::Domain;
+use virt::error::{Error as LibvirtError, clear_error_callback};
+use virt::sys;
 
-#[derive(Error, Debug)]
-pub enum DriverError {
-    #[error("data store disconnected")]
-    Connection(#[from] LibvirtError),
-    // #[error("the data for key `{0}` is not available")]
-    // Redaction(String),
-    // #[error("invalid header (expected {expected:?}, found {found:?})")]
-    // InvalidHeader { expected: String, found: String },
-    // #[error("unknown data store error")]
-    // Unknown,
+use crate::error::DriverError;
+
+pub struct Driver {
+    connection: Connect,
+}
+
+impl Driver {
+    const XEN_URI: &'static str = "xen:///system";
+
+    pub fn new() -> Result<Self, DriverError> {
+        // Initialize the libvirt connection
+        let connection =
+            Connect::open(Some(Driver::XEN_URI)).map_err(|e| DriverError::Connection(e))?;
+
+        // Do not print errors to stdout
+        clear_error_callback();
+
+        Ok(Driver { connection })
+    }
 }

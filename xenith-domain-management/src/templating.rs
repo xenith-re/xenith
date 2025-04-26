@@ -132,14 +132,12 @@ mod tests {
         let disks = DiskDevices(vec![
             Disk {
                 target: PathBuf::from("/dev/sda"),
-                size: u32::MAX as u64,
                 format: DiskFormat::Qcow2,
                 access: DiskAccess::ReadWrite,
                 virtual_device: "xvda".to_string(),
             },
             Disk {
                 target: PathBuf::from("/dev/sdb"),
-                size: u64::MAX,
                 format: DiskFormat::Raw,
                 access: DiskAccess::ReadOnly,
                 virtual_device: "xvdb".to_string(),
