@@ -26,6 +26,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //! The domain configuration files are stored in the `/xenith/domains` directory.
 //! The ansible playbooks and roles are stored in the `/xenith/ansible` directory.
 
+mod disk;
+mod domain;
+mod image;
+mod template;
+
+pub use disk::Disk;
+pub use domain::Domain;
+pub use image::Image;
+pub use template::Template;
+
 use std::fs::create_dir_all;
 use std::{fmt::Display, path::PathBuf};
 
@@ -33,250 +43,6 @@ use serde::{Deserialize, Serialize};
 
 use crate::domain::DiskFormat;
 use crate::error::ConfigurationError;
-
-#[derive(Debug, Clone, Default, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize)]
-pub struct Image {
-    name: String,
-    path: PathBuf,
-    checksum: String,
-}
-
-impl Image {
-    pub fn new(name: String, path: PathBuf, checksum: String) -> Self {
-        Self {
-            name,
-            path,
-            checksum,
-        }
-    }
-
-    pub fn get_path(&self) -> &PathBuf {
-        &self.path
-    }
-
-    pub fn get_checksum(&self) -> &String {
-        &self.checksum
-    }
-}
-
-impl Display for Image {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "Image({{ name: {}, path: {}, checksum: {} }})",
-            self.name,
-            self.path.display(),
-            self.checksum
-        )
-    }
-}
-
-#[derive(Debug, Clone, Default, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize)]
-pub struct Template {
-    image_template: PathBuf,
-    variables: Option<PathBuf>,
-}
-
-impl Template {
-    pub fn new(image_template: PathBuf, variables: Option<PathBuf>) -> Self {
-        Self {
-            image_template,
-            variables,
-        }
-    }
-
-    pub fn get_image_template(&self) -> &PathBuf {
-        &self.image_template
-    }
-
-    pub fn get_variables(&self) -> Option<&PathBuf> {
-        self.variables.as_ref()
-    }
-}
-
-impl Display for Template {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "Template({{ image_template: {}, variables: {} }})",
-            self.image_template.display(),
-            self.variables
-                .as_ref()
-                .map_or("None".to_string(), |v| v.display().to_string())
-        )
-    }
-}
-
-#[derive(Debug, Clone, Default, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize)]
-pub struct Disk {
-    name: String,
-    path: PathBuf,
-    /// Size of the disk in bytes. This is required for file-based disk images.
-    size: u64,
-    format: DiskFormat,
-}
-
-impl Disk {
-    pub fn new(name: String, path: PathBuf, size: u64, format: DiskFormat) -> Self {
-        Self {
-            name,
-            path,
-            size,
-            format,
-        }
-    }
-
-    pub fn get_name(&self) -> &String {
-        &self.name
-    }
-
-    pub fn get_path(&self) -> &PathBuf {
-        &self.path
-    }
-
-    pub fn get_format(&self) -> &DiskFormat {
-        &self.format
-    }
-
-    pub fn get_size_in_gb(&self) -> f64 {
-        self.size as f64 / (1024.0 * 1024.0 * 1024.0)
-    }
-
-    pub fn get_size_in_mb(&self) -> f64 {
-        self.size as f64 / (1024.0 * 1024.0)
-    }
-
-    pub fn get_size_in_kb(&self) -> f64 {
-        self.size as f64 / 1024.0
-    }
-
-    pub fn get_size_in_bytes(&self) -> u64 {
-        self.size
-    }
-}
-
-impl Display for Disk {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "Disk({{ name: {}, path: {}, size: {}, format: {} }})",
-            self.name,
-            self.path.display(),
-            self.get_size_in_gb(),
-            self.format
-        )
-    }
-}
-
-/// Domain configuration
-#[derive(Debug, Clone, Default, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize)]
-pub struct Domain {
-    /// Name of the domain
-    name: String,
-    /// Path to the domain configuration directory
-    /// This is the directory where all domain configurations are stored.
-    path: PathBuf,
-    /// Path to the domain libvirt configuration file
-    /// This is the file that contains the domain configuration
-    /// in libvirt XML format.
-    /// It is used to create the domain in libvirt.
-    configuration_file: Option<PathBuf>,
-    /// List of disks for the domain
-    /// This is the list of disks that are used by the domain.
-    disks: Vec<Disk>,
-    /// Packer templates for the domain
-    templates: Option<Template>,
-}
-
-impl Domain {
-    pub fn new(
-        name: String,
-        path: PathBuf,
-        configuration_file: Option<PathBuf>,
-        disks: Vec<Disk>,
-        templates: Option<Template>,
-    ) -> Self {
-        Self {
-            name,
-            path,
-            configuration_file,
-            disks,
-            templates,
-        }
-    }
-
-    /// Get the domain name
-    /// This is the name of the domain that is used to create
-    /// the domain in libvirt.
-    /// It is also used to create the domain configuration directory.
-    ///
-    /// # Returns
-    ///
-    /// * `&String` - The name of the domain.
-    pub fn get_name(&self) -> &String {
-        &self.name
-    }
-
-    /// Get the domain configuration directory
-    /// This is the directory where all domain configurations are stored.
-    /// It is used to create the domain configuration directory.
-    ///
-    /// # Returns
-    ///
-    /// * `&PathBuf` - The path to the domain configuration directory.
-    pub fn get_path(&self) -> &PathBuf {
-        &self.path
-    }
-
-    /// Get the domain configuration file
-    /// This is the file that contains the domain configuration
-    /// in libvirt XML format.
-    /// It is used to create the domain in libvirt.
-    ///
-    /// It may not exist if the domain is not created yet.
-    ///
-    /// # Returns
-    ///
-    /// * `Option<&PathBuf>` - The path to the domain configuration file.
-    pub fn get_configuration_file(&self) -> Option<&PathBuf> {
-        self.configuration_file.as_ref()
-    }
-
-    /// Get the disks for the domain
-    /// This is the list of disks that are used by the domain.
-    /// It is used to create the domain in libvirt.
-    ///
-    /// # Returns
-    ///
-    /// * `&Vec<Disk>` - The list of disks for the domain.
-    pub fn get_disks(&self) -> &Vec<Disk> {
-        &self.disks
-    }
-
-    /// Get the Packer templates for the domain
-    /// It is used to create the domain disk image.
-    ///
-    /// It may not exist if the user uses a custom image.
-    ///
-    /// # Returns
-    ///
-    /// * `Option<&Template>` - The templates for the domain.
-    pub fn get_templates(&self) -> Option<&Template> {
-        self.templates.as_ref()
-    }
-}
-
-impl Display for Domain {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(
-            f,
-            "Domain({{ name: {}, path: {}, disks: {:?} }})",
-            self.name,
-            self.path.display(),
-            self.disks
-        )
-    }
-}
 
 #[derive(Debug, Clone, Default, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize)]
 pub struct Configuration {
@@ -404,7 +170,7 @@ impl Configuration {
     ///
     /// * `Option<&Image>` - The image if it exists, otherwise None.
     pub fn get_image(&self, name: &str) -> Option<&Image> {
-        self.images.iter().find(|image| image.name == name)
+        self.images.iter().find(|image| image.get_name() == name)
     }
 
     /// Get the path to an image by its name
@@ -416,8 +182,8 @@ impl Configuration {
     /// # Returns
     ///
     /// * `Option<PathBuf>` - The path to the image if it exists, otherwise None.
-    pub fn get_image_path(&self, image_name: &str) -> Option<PathBuf> {
-        self.get_image(image_name).map(|image| image.path.clone())
+    pub fn get_image_path(&self, image_name: &str) -> Option<&PathBuf> {
+        self.get_image(image_name).map(|image| image.get_path())
     }
 
     /// Get a domain by its name
@@ -430,7 +196,7 @@ impl Configuration {
     ///
     /// * `Option<&Domain>` - The domain if it exists, otherwise None.
     pub fn get_domain(&self, name: &str) -> Option<&Domain> {
-        self.domains.iter().find(|domain| domain.name == name)
+        self.domains.iter().find(|domain| domain.get_name() == name)
     }
 
     /// Get the path to a domain by its name
@@ -442,9 +208,8 @@ impl Configuration {
     /// # Returns
     ///
     /// * `Option<PathBuf>` - The path to the domain if it exists, otherwise None.
-    pub fn get_domain_path(&self, domain_name: &str) -> Option<PathBuf> {
-        self.get_domain(domain_name)
-            .map(|domain| domain.path.clone())
+    pub fn get_domain_path(&self, domain_name: &str) -> Option<&PathBuf> {
+        self.get_domain(domain_name).map(|domain| domain.get_path())
     }
 
     /// Get the disks for a domain by its name
@@ -457,7 +222,8 @@ impl Configuration {
     ///
     /// * `Option<&Vec<Disk>>` - The disks for the domain if it exists, otherwise None.
     pub fn get_domain_disks(&self, domain_name: &str) -> Option<&Vec<Disk>> {
-        self.get_domain(domain_name).map(|domain| &domain.disks)
+        self.get_domain(domain_name)
+            .map(|domain| domain.get_disks())
     }
 
     /// Get the libvirt configuration file for a domain by its name
@@ -471,7 +237,7 @@ impl Configuration {
     /// * `Option<&PathBuf>` - The path to the libvirt configuration file if it exists, otherwise None.
     pub fn get_domain_libvirt_configuration_file(&self, domain_name: &str) -> Option<&PathBuf> {
         self.get_domain(domain_name)
-            .and_then(|domain| domain.configuration_file.as_ref())
+            .and_then(|domain| domain.get_configuration_file())
     }
 
     /// Get a disk for a domain by its name
@@ -486,7 +252,7 @@ impl Configuration {
     /// * `Option<&Disk>` - The disk for the domain if it exists, otherwise None.
     pub fn get_disk(&self, domain_name: &str, disk_name: &str) -> Option<&Disk> {
         self.get_domain_disks(domain_name)
-            .and_then(|disks| disks.iter().find(|disk| disk.name == disk_name))
+            .and_then(|disks| disks.iter().find(|disk| disk.get_name() == disk_name))
     }
 
     /// Get the path to a disk for a domain by its name
@@ -499,9 +265,9 @@ impl Configuration {
     /// # Returns
     ///
     /// * `Option<PathBuf>` - The path to the disk if it exists, otherwise None.
-    pub fn get_disk_path(&self, domain_name: &str, disk_name: &str) -> Option<PathBuf> {
+    pub fn get_disk_path(&self, domain_name: &str, disk_name: &str) -> Option<&PathBuf> {
         self.get_disk(domain_name, disk_name)
-            .map(|disk| disk.path.clone())
+            .map(|disk| disk.get_path())
     }
 
     /// Get the size of a disk for a domain by its name
@@ -515,7 +281,8 @@ impl Configuration {
     ///
     /// * `Option<u64>` - The size of the disk in bytes if it exists, otherwise None.
     pub fn get_disk_size(&self, domain_name: &str, disk_name: &str) -> Option<u64> {
-        self.get_disk(domain_name, disk_name).map(|disk| disk.size)
+        self.get_disk(domain_name, disk_name)
+            .map(|disk| disk.get_size_in_bytes())
     }
 
     /// Get the format of a disk for a domain by its name
@@ -528,9 +295,9 @@ impl Configuration {
     /// # Returns
     ///
     /// * `Option<DiskFormat>` - The format of the disk if it exists, otherwise None.
-    pub fn get_disk_format(&self, domain_name: &str, disk_name: &str) -> Option<DiskFormat> {
+    pub fn get_disk_format(&self, domain_name: &str, disk_name: &str) -> Option<&DiskFormat> {
         self.get_disk(domain_name, disk_name)
-            .map(|disk| disk.format.clone())
+            .map(|disk| disk.get_format())
     }
 
     /// Get the Packer templates for a domain by its name
@@ -544,7 +311,7 @@ impl Configuration {
     /// * `Option<&Template>` - The templates for the domain if it exists, otherwise None.
     pub fn get_domain_templates(&self, domain_name: &str) -> Option<&Template> {
         self.get_domain(domain_name)
-            .and_then(|domain| domain.templates.as_ref())
+            .and_then(|domain| domain.get_templates())
     }
 }
 
@@ -560,85 +327,6 @@ impl Display for Configuration {
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    #[test]
-    fn test_image_creation() {
-        let image = Image::new(
-            "test_image".to_string(),
-            PathBuf::from("/xenith/images/test_image.img"),
-            "checksum123".to_string(),
-        );
-
-        assert_eq!(
-            image.get_path(),
-            &PathBuf::from("/xenith/images/test_image.img")
-        );
-        assert_eq!(image.get_checksum(), "checksum123");
-    }
-
-    #[test]
-    fn test_template_creation() {
-        let template = Template::new(
-            PathBuf::from("/xenith/templates/template.json"),
-            Some(PathBuf::from("/xenith/templates/variables.json")),
-        );
-
-        assert_eq!(
-            template.get_image_template(),
-            &PathBuf::from("/xenith/templates/template.json")
-        );
-        assert_eq!(
-            template.get_variables(),
-            Some(&PathBuf::from("/xenith/templates/variables.json"))
-        );
-    }
-
-    #[test]
-    fn test_disk_creation() {
-        let disk = Disk::new(
-            "test_disk".to_string(),
-            PathBuf::from("/xenith/disks/test_disk.img"),
-            1024 * 1024 * 1024,
-            DiskFormat::Raw,
-        );
-
-        assert_eq!(disk.get_name(), "test_disk");
-        assert_eq!(
-            disk.get_path(),
-            &PathBuf::from("/xenith/disks/test_disk.img")
-        );
-        assert_eq!(disk.get_size_in_gb(), 1.0);
-        assert_eq!(disk.get_format(), &DiskFormat::Raw);
-    }
-
-    #[test]
-    fn test_domain_creation() {
-        let disk = Disk::new(
-            "test_disk".to_string(),
-            PathBuf::from("/xenith/disks/test_disk.img"),
-            1024 * 1024 * 1024,
-            DiskFormat::Raw,
-        );
-        let domain = Domain::new(
-            "test_domain".to_string(),
-            PathBuf::from("/xenith/domains/test_domain"),
-            Some(PathBuf::from("/xenith/domains/test_domain/config.xml")),
-            vec![disk.clone()],
-            None,
-        );
-
-        assert_eq!(domain.get_name(), "test_domain");
-        assert_eq!(
-            domain.get_path(),
-            &PathBuf::from("/xenith/domains/test_domain")
-        );
-        assert_eq!(
-            domain.get_configuration_file(),
-            Some(&PathBuf::from("/xenith/domains/test_domain/config.xml"))
-        );
-        assert_eq!(domain.get_disks(), &vec![disk]);
-        assert!(domain.get_templates().is_none());
-    }
 
     #[test]
     fn test_configuration_add_image() {
