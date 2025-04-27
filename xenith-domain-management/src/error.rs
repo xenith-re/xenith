@@ -16,17 +16,30 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+use std::io::Error as IoError;
 use thiserror::Error;
 use virt::error::Error as LibvirtError;
 
 #[derive(Error, Debug)]
 pub enum DriverError {
-    #[error("data store disconnected")]
-    Connection(#[from] LibvirtError),
-    // #[error("the data for key `{0}` is not available")]
-    // Redaction(String),
-    // #[error("invalid header (expected {expected:?}, found {found:?})")]
-    // InvalidHeader { expected: String, found: String },
-    // #[error("unknown data store error")]
-    // Unknown,
+    #[error("Connection error")]
+    Connection(#[source] LibvirtError),
+    #[error("Configuration error")]
+    Configuration(#[from] ConfigurationError),
+    #[error("Domain name doesn't exist")]
+    DomainNotFound(#[source] LibvirtError),
+    #[error("Domain not running")]
+    DomainNotRunning,
+    #[error("Domain without name")]
+    DomainWithoutName,
+    #[error("Unknown driver error")]
+    Unknown,
+}
+
+#[derive(Error, Debug)]
+pub enum ConfigurationError {
+    #[error("Can't create configuration files")]
+    Creation(#[from] IoError),
+    #[error("Unknown configuration error")]
+    Unknown,
 }
