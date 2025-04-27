@@ -5,7 +5,6 @@
 [workspace]
 resolver = "2" # see https://doc.rust-lang.org/cargo/reference/resolver.html#resolver-versions
 members = [
-    "xenith-core",
     "xenith-domain-management",
     "xenith-vmi",
     "xenith-cli",

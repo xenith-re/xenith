@@ -16,6 +16,16 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
+//! Xenith domain configuration
+//! This module contains the configuration for Xenith
+//! domains like disks, templates, and the domain configuration
+//! itself.
+//!
+//! The configuration is stored in the `/xenith` directory
+//! and the images are stored in the `/xenith/images` directory.
+//! The domain configuration files are stored in the `/xenith/domains` directory.
+//! The ansible playbooks and roles are stored in the `/xenith/ansible` directory.
+
 use std::fs::create_dir_all;
 use std::{fmt::Display, path::PathBuf};
 
