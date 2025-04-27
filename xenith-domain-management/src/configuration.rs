@@ -32,6 +32,7 @@ use std::{fmt::Display, path::PathBuf};
 use serde::{Deserialize, Serialize};
 
 use crate::domain::DiskFormat;
+use crate::error::ConfigurationError;
 
 #[derive(Debug, Clone, Default, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize)]
 pub struct Image {
@@ -346,7 +347,7 @@ impl Configuration {
     ///
     /// * `Ok(())` - If the directories were created successfully.
     /// * `Err(std::io::Error)` - If the directories could not be created.
-    pub fn create_configuration() -> std::io::Result<()> {
+    pub fn create_configuration(&self) -> Result<(), ConfigurationError> {
         let paths = [
             Self::DOMAIN_CONFIGURATION_PATH,
             Self::IMAGES_PATH,
@@ -377,7 +378,7 @@ impl Configuration {
     ///
     /// * `Ok(PathBuf)` - The path to the domain configuration directory.
     /// * `Err(std::io::Error)` - If the directory could not be created.
-    pub fn create_domain_configuration(domain_name: &str) -> std::io::Result<PathBuf> {
+    pub fn create_domain_configuration(domain_name: &str) -> Result<PathBuf, ConfigurationError> {
         let path = PathBuf::from(format!("{}/{}", Self::DOMAINS_PATH, domain_name));
 
         if !path.exists() {
@@ -403,10 +404,7 @@ impl Configuration {
     ///
     /// * `Option<&Image>` - The image if it exists, otherwise None.
     pub fn get_image(&self, name: &str) -> Option<&Image> {
-        self.images
-            .iter()
-            .find(|image| image.name == name)
-            .map(|image| image)
+        self.images.iter().find(|image| image.name == name)
     }
 
     /// Get the path to an image by its name
@@ -432,10 +430,7 @@ impl Configuration {
     ///
     /// * `Option<&Domain>` - The domain if it exists, otherwise None.
     pub fn get_domain(&self, name: &str) -> Option<&Domain> {
-        self.domains
-            .iter()
-            .find(|domain| domain.name == name)
-            .map(|domain| domain)
+        self.domains.iter().find(|domain| domain.name == name)
     }
 
     /// Get the path to a domain by its name
@@ -463,6 +458,20 @@ impl Configuration {
     /// * `Option<&Vec<Disk>>` - The disks for the domain if it exists, otherwise None.
     pub fn get_domain_disks(&self, domain_name: &str) -> Option<&Vec<Disk>> {
         self.get_domain(domain_name).map(|domain| &domain.disks)
+    }
+
+    /// Get the libvirt configuration file for a domain by its name
+    ///
+    /// # Arguments
+    ///
+    /// * `domain_name` - The name of the domain.
+    ///
+    /// # Returns
+    ///
+    /// * `Option<&PathBuf>` - The path to the libvirt configuration file if it exists, otherwise None.
+    pub fn get_domain_libvirt_configuration_file(&self, domain_name: &str) -> Option<&PathBuf> {
+        self.get_domain(domain_name)
+            .and_then(|domain| domain.configuration_file.as_ref())
     }
 
     /// Get a disk for a domain by its name
@@ -546,5 +555,188 @@ impl Display for Configuration {
             "Configuration({{ images: {:?}, domains: {:?} }})",
             self.images, self.domains
         )
+    }
+}
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_image_creation() {
+        let image = Image::new(
+            "test_image".to_string(),
+            PathBuf::from("/xenith/images/test_image.img"),
+            "checksum123".to_string(),
+        );
+
+        assert_eq!(
+            image.get_path(),
+            &PathBuf::from("/xenith/images/test_image.img")
+        );
+        assert_eq!(image.get_checksum(), "checksum123");
+    }
+
+    #[test]
+    fn test_template_creation() {
+        let template = Template::new(
+            PathBuf::from("/xenith/templates/template.json"),
+            Some(PathBuf::from("/xenith/templates/variables.json")),
+        );
+
+        assert_eq!(
+            template.get_image_template(),
+            &PathBuf::from("/xenith/templates/template.json")
+        );
+        assert_eq!(
+            template.get_variables(),
+            Some(&PathBuf::from("/xenith/templates/variables.json"))
+        );
+    }
+
+    #[test]
+    fn test_disk_creation() {
+        let disk = Disk::new(
+            "test_disk".to_string(),
+            PathBuf::from("/xenith/disks/test_disk.img"),
+            1024 * 1024 * 1024,
+            DiskFormat::Raw,
+        );
+
+        assert_eq!(disk.get_name(), "test_disk");
+        assert_eq!(
+            disk.get_path(),
+            &PathBuf::from("/xenith/disks/test_disk.img")
+        );
+        assert_eq!(disk.get_size_in_gb(), 1.0);
+        assert_eq!(disk.get_format(), &DiskFormat::Raw);
+    }
+
+    #[test]
+    fn test_domain_creation() {
+        let disk = Disk::new(
+            "test_disk".to_string(),
+            PathBuf::from("/xenith/disks/test_disk.img"),
+            1024 * 1024 * 1024,
+            DiskFormat::Raw,
+        );
+        let domain = Domain::new(
+            "test_domain".to_string(),
+            PathBuf::from("/xenith/domains/test_domain"),
+            Some(PathBuf::from("/xenith/domains/test_domain/config.xml")),
+            vec![disk.clone()],
+            None,
+        );
+
+        assert_eq!(domain.get_name(), "test_domain");
+        assert_eq!(
+            domain.get_path(),
+            &PathBuf::from("/xenith/domains/test_domain")
+        );
+        assert_eq!(
+            domain.get_configuration_file(),
+            Some(&PathBuf::from("/xenith/domains/test_domain/config.xml"))
+        );
+        assert_eq!(domain.get_disks(), &vec![disk]);
+        assert!(domain.get_templates().is_none());
+    }
+
+    #[test]
+    fn test_configuration_add_image() {
+        let mut config = Configuration::new();
+        let image = Image::new(
+            "test_image".to_string(),
+            PathBuf::from("/xenith/images/test_image.img"),
+            "checksum123".to_string(),
+        );
+
+        config.add_image(image.clone());
+        assert_eq!(config.get_images(), &vec![image]);
+    }
+
+    #[test]
+    fn test_configuration_add_domain() {
+        let mut config = Configuration::new();
+        let domain = Domain::new(
+            "test_domain".to_string(),
+            PathBuf::from("/xenith/domains/test_domain"),
+            None,
+            vec![],
+            None,
+        );
+
+        config.add_domain(domain.clone());
+        assert_eq!(config.get_domains(), &vec![domain]);
+    }
+
+    #[test]
+    fn test_configuration_get_image() {
+        let mut config = Configuration::new();
+        let image = Image::new(
+            "test_image".to_string(),
+            PathBuf::from("/xenith/images/test_image.img"),
+            "checksum123".to_string(),
+        );
+
+        config.add_image(image.clone());
+        assert_eq!(config.get_image("test_image"), Some(&image));
+        assert!(config.get_image("nonexistent_image").is_none());
+    }
+
+    #[test]
+    fn test_configuration_get_domain() {
+        let mut config = Configuration::new();
+        let domain = Domain::new(
+            "test_domain".to_string(),
+            PathBuf::from("/xenith/domains/test_domain"),
+            None,
+            vec![],
+            None,
+        );
+
+        config.add_domain(domain.clone());
+        assert_eq!(config.get_domain("test_domain"), Some(&domain));
+        assert!(config.get_domain("nonexistent_domain").is_none());
+    }
+
+    // This must be mocked or run in a test environment
+
+    // #[test]
+    // fn test_configuration_create_configuration() {
+    //     let config = Configuration::new();
+
+    //     let result = config.create_configuration();
+    //     assert!(result.is_ok());
+    // }
+
+    // #[test]
+    // fn test_configuration_create_domain_configuration() {
+    //     let result = Configuration::create_domain_configuration("test_domain");
+    //     assert!(result.is_ok());
+    //     assert_eq!(
+    //         result.unwrap(),
+    //         PathBuf::from("/xenith/domains/test_domain")
+    //     );
+    // }
+
+    #[test]
+    fn test_configuration_get_disk() {
+        let disk = Disk::new(
+            "test_disk".to_string(),
+            PathBuf::from("/xenith/disks/test_disk.img"),
+            1024 * 1024 * 1024,
+            DiskFormat::Raw,
+        );
+        let domain = Domain::new(
+            "test_domain".to_string(),
+            PathBuf::from("/xenith/domains/test_domain"),
+            None,
+            vec![disk.clone()],
+            None,
+        );
+        let mut config = Configuration::new();
+        config.add_domain(domain);
+
+        assert_eq!(config.get_disk("test_domain", "test_disk"), Some(&disk));
+        assert!(config.get_disk("test_domain", "nonexistent_disk").is_none());
     }
 }
