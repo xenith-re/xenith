@@ -45,7 +45,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 //! It is to note that all operating systems images are built using [Hashicorp Packer](https://developer.hashicorp.com/packer).
 //! This is to ensure that the images are built in a reproducible way and allows you to save setup time.
 
-pub mod actions;
 pub mod configuration;
 pub mod domain;
 pub mod driver;
