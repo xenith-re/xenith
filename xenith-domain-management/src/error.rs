@@ -39,7 +39,9 @@ pub enum DriverError {
 #[derive(Error, Debug)]
 pub enum ConfigurationError {
     #[error("Can't create configuration files")]
-    Creation(#[from] IoError),
+    Creation(#[source] IoError),
+    #[error("Can't parse configuration files")]
+    Parsing(#[source] IoError),
     #[error("Unknown configuration error")]
     Unknown,
 }
