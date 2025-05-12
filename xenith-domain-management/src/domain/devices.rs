@@ -60,6 +60,19 @@ impl Display for DiskFormat {
     }
 }
 
+impl From<String> for DiskFormat {
+    fn from(format: String) -> Self {
+        match format.as_str() {
+            "raw" => DiskFormat::Raw,
+            "qcow" => DiskFormat::Qcow,
+            "qcow2" => DiskFormat::Qcow2,
+            "vhd" => DiskFormat::Vhd,
+            "qed" => DiskFormat::Qed,
+            _ => DiskFormat::Raw, // Default to Raw if format is unknown
+        }
+    }
+}
+
 /// Access control information for a disk
 #[derive(Debug, Clone, Default, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize)]
 pub enum DiskAccess {
