@@ -39,7 +39,7 @@ This is the only service that uses the `/xenith` directory. The directory is str
                 /snapshots
                     # contains all disk snapshots
             /templates
-                debian-default.hcl # packer image template
+                debian-default.pkr.hcl # packer image template
                 template-variables.hcl # generated image variables
 
         /windows11-default

@@ -88,17 +88,12 @@ impl Display for Disk {
     }
 }
 
-impl TryFrom<PathBuf> for Disk {
+impl TryFrom<&PathBuf> for Disk {
     type Error = std::io::Error;
 
-    fn try_from(path: PathBuf) -> Result<Self, Self::Error> {
+    fn try_from(path: &PathBuf) -> Result<Self, Self::Error> {
         // Check if the file exists
-        if !path.exists() {
-            return Err(std::io::Error::new(
-                std::io::ErrorKind::NotFound,
-                format!("File not found: {}", path.display()),
-            ));
-        }
+        path.try_exists()?;
 
         // Check if the file is a regular file
         if !path.is_file() {
@@ -136,7 +131,7 @@ impl TryFrom<PathBuf> for Disk {
 
         Ok(Self {
             name,
-            path,
+            path: path.clone(),
             size,
             format,
         })

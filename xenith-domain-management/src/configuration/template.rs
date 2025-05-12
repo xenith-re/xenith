@@ -57,6 +57,82 @@ impl Display for Template {
     }
 }
 
+impl TryFrom<&PathBuf> for Template {
+    type Error = std::io::Error;
+
+    /// Creates a new Template from a directory path.
+    /// The directory must contain a file with the extension `.pkr.hcl` for the image template
+    /// and an optional file with the extension `.hcl` for the variables.
+    fn try_from(path: &PathBuf) -> Result<Self, Self::Error> {
+        // Check if the file exists
+        path.try_exists()?;
+
+        // Check if the file is a directory
+        if path.is_file() {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::InvalidInput,
+                format!("Not a regular file: {}", path.display()),
+            ));
+        }
+
+        // Check if the directory is empty
+        if path.read_dir()?.next().is_none() {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::InvalidInput,
+                format!("Directory is empty: {}", path.display()),
+            ));
+        }
+
+        let mut image_template = None;
+        let mut variables = None;
+
+        let mut hcl_files = vec![];
+        for entry in path.read_dir()? {
+            let entry = entry?;
+            let path = entry.path();
+            let extension = path.extension().and_then(|s| s.to_str());
+
+            // Check if the file is a regular file
+            if !path.is_file() {
+                continue;
+            }
+
+            if extension != Some("hcl") {
+                continue;
+            }
+
+            hcl_files.push(path);
+        }
+
+        // If `.pkr.hcl` file is found, set it as the image template
+        for file in hcl_files.iter() {
+            let file_name = file
+                .file_name()
+                .and_then(|s| s.to_str())
+                .unwrap_or_default();
+
+            if file_name.contains(".pkr.hcl") {
+                image_template = Some(file.clone());
+            } else if file_name.contains(".hcl") {
+                variables = Some(file.clone());
+            }
+        }
+
+        if image_template.is_none() {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::NotFound,
+                format!("No image template found in directory: {}", path.display()),
+            ));
+        }
+        let image_template = image_template.unwrap();
+
+        Ok(Template {
+            image_template,
+            variables,
+        })
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
