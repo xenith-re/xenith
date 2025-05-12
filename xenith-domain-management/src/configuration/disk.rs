@@ -25,10 +25,14 @@ use crate::domain::DiskFormat;
 
 #[derive(Debug, Clone, Default, Eq, PartialEq, Ord, PartialOrd, Hash, Serialize, Deserialize)]
 pub struct Disk {
+    /// Name of the disk
     name: String,
+    /// Path to the disk image
     path: PathBuf,
     /// Size of the disk in bytes. This is required for file-based disk images.
     size: u64,
+    /// Format of the disk image
+    /// This is required for file-based disk images.
     format: DiskFormat,
 }
 
@@ -81,6 +85,61 @@ impl Display for Disk {
             self.get_size_in_gb(),
             self.format
         )
+    }
+}
+
+impl TryFrom<PathBuf> for Disk {
+    type Error = std::io::Error;
+
+    fn try_from(path: PathBuf) -> Result<Self, Self::Error> {
+        // Check if the file exists
+        if !path.exists() {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::NotFound,
+                format!("File not found: {}", path.display()),
+            ));
+        }
+
+        // Check if the file is a regular file
+        if !path.is_file() {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::InvalidInput,
+                format!("Not a regular file: {}", path.display()),
+            ));
+        }
+
+        // Check if the file is not empty
+        let metadata = path.metadata()?;
+        if metadata.len() == 0 {
+            return Err(std::io::Error::new(
+                std::io::ErrorKind::InvalidData,
+                format!("File is empty: {}", path.display()),
+            ));
+        }
+
+        // Create the Disk object
+        let name = path
+            .file_name()
+            .and_then(|s| s.to_str())
+            .unwrap_or("unknown")
+            .to_string();
+
+        let size = path.metadata()?.len();
+
+        let disk_extension = path
+            .extension()
+            .and_then(|s| s.to_str())
+            .unwrap_or("raw")
+            .to_string();
+
+        let format = DiskFormat::from(disk_extension);
+
+        Ok(Self {
+            name,
+            path,
+            size,
+            format,
+        })
     }
 }
 
