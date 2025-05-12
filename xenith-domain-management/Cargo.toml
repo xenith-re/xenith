@@ -1,5 +1,5 @@
 [package]
-name = "xenith-vm"
+name = "xenith-dm"
 description = "Library for interacting with Xen. Allows to easily create and manage supported VMs through libvirt."
 
 # Inherit workspace settings
@@ -17,7 +17,7 @@ keywords.workspace = true
 include = ["templates/"]
 
 [[bin]]
-name = "xenith-vm"
+name = "xenith-dm"
 path = "src/main.rs"
 
 [dependencies]
