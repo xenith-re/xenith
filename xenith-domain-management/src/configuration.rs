@@ -123,7 +123,7 @@ impl Configuration {
 
         for path in paths.iter() {
             if !PathBuf::from(path).exists() {
-                create_dir_all(path)?;
+                create_dir_all(path).map_err(ConfigurationError::Creation)?;
             }
         }
 
@@ -148,13 +148,13 @@ impl Configuration {
         let path = PathBuf::from(format!("{}/{}", Self::DOMAINS_PATH, domain_name));
 
         if !path.exists() {
-            create_dir_all(&path)?;
+            create_dir_all(&path).map_err(ConfigurationError::Creation)?;
 
             let disks_path = path.join("disks").join("snapshots");
             let templates_path = path.join("templates");
 
-            create_dir_all(&disks_path)?;
-            create_dir_all(&templates_path)?;
+            create_dir_all(&disks_path).map_err(ConfigurationError::Creation)?;
+            create_dir_all(&templates_path).map_err(ConfigurationError::Creation)?;
         }
 
         Ok(path)
@@ -349,6 +349,7 @@ mod tests {
             PathBuf::from("/xenith/domains/test_domain"),
             None,
             vec![],
+            vec![],
             None,
         );
 
@@ -377,6 +378,7 @@ mod tests {
             "test_domain".to_string(),
             PathBuf::from("/xenith/domains/test_domain"),
             None,
+            vec![],
             vec![],
             None,
         );
@@ -419,6 +421,7 @@ mod tests {
             PathBuf::from("/xenith/domains/test_domain"),
             None,
             vec![disk.clone()],
+            vec![],
             None,
         );
         let mut config = Configuration::new();
